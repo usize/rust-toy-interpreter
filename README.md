@@ -1,8 +1,8 @@
 Harvey
 ============
 
-A programming language and stack based virtual machine written in Rust.
+<a href="https://www.youtube.com/watch?v=coF-opzhXuc">
+Programming language, virtual machine, sidekick, and all around good guy.
+</a>
 
 ---
-
-<iframe width="420" height="315" src="https://www.youtube.com/embed/coF-opzhXuc" frameborder="0" allowfullscreen></iframe>
