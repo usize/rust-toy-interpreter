@@ -15,10 +15,10 @@ impl Script {
     }
 }
 
-fn compile_expression(script: &mut Script, expr: &Expression) {
+fn compile_expression(script: &mut Script, expr: &Expr) {
     match expr {
-        &Expression::Atom(v) => script.stack.push(v),
-        &Expression::BinaryOperation(ref bop) => {
+        &Expr::Atom(v) => script.stack.push(v),
+        &Expr::BinaryOperation(ref bop) => {
             compile_expression(script, &bop.r_expr);
             compile_expression(script, &bop.l_expr);
             match bop.op {
@@ -28,14 +28,17 @@ fn compile_expression(script: &mut Script, expr: &Expression) {
                 BinOp::DIV  => script.program.push(OpCode::DIV),
             }
         },
-        &Expression::Nil => (),
+        &Expr::Nil => (),
     }
 }
 
-pub fn compile_script(expressions: Vec<Expression>) -> Script {
+pub fn compile_script(statements: Vec<Statement>) -> Script {
     let mut script = Script::new();
-    for expr in expressions {
-        compile_expression(&mut script, &expr);
+    for statement in statements {
+        match statement {
+            Statement::Expression(s) => compile_expression(&mut script, &s),
+            Statement::Nil => (),
+        }
     }
     return script;
 }
