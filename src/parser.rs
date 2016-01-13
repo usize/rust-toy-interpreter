@@ -33,7 +33,6 @@ pub enum Expr {
 #[derive(Debug)]
 pub enum Statement {
     Expression(Expr),
-    Nil,
 }
 
 pub struct Parser {

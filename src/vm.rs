@@ -4,6 +4,7 @@ use value::*;
 
 #[derive(Debug)]
 pub enum OpCode {
+    VAL(Value), // stack.push(Value)
     ADD, // stack.pop() + stack.pop()
     SUB, // stack.pop() - stack.pop()
     MUL, // stack.pop() * stack.pop()
@@ -29,9 +30,9 @@ impl VM {
         };
     }
 
-    pub fn load(&mut self, program: Vec<OpCode>, data: Vec<Value>) {
+    pub fn load(&mut self, program: Vec<OpCode>) {
         self.program = program;
-        self.stack = data;
+        self.stack = Vec::new();
         self.ip = 0;
     }
 
@@ -71,10 +72,11 @@ impl VM {
         self.running = true;
         while self.running && self.ip < self.program.len() {
             match self.program[self.ip] {
-                OpCode::ADD => self.add(),
-                OpCode::SUB => self.sub(),
-                OpCode::MUL => self.mul(),
-                OpCode::DIV => self.div(),
+                OpCode::VAL(v)      => self.stack.push(v),
+                OpCode::ADD         => self.add(),
+                OpCode::SUB         => self.sub(),
+                OpCode::MUL         => self.mul(),
+                OpCode::DIV         => self.div(),
             }
             self.ip += 1;
         }

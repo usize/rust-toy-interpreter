@@ -37,7 +37,7 @@ fn main() {
             let statements = parser.parse_lines(buffer.clone());
             println!("Parser: {:?}", &statements);
             let script = compile_script(statements);
-            vm.load(script.program, script.stack);
+            vm.load(script.program);
             vm.run();
             println!("VM: stack: {:?}, program: {:?}", vm.stack(), vm.program());
         }

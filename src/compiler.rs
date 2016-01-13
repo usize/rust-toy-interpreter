@@ -1,23 +1,21 @@
 use vm::*;
-use value::*;
 use lexer::*;
 use parser::*;
 
 // Everything you need to run some code in the vm
 pub struct Script {
     pub program: Vec<OpCode>,
-    pub stack:   Vec<Value>
 }
 
 impl Script {
     pub fn new() -> Script {
-        return Script{program: Vec::new(), stack: Vec::new()};
+        return Script{program: Vec::new()};
     }
 }
 
 fn compile_expression(script: &mut Script, expr: &Expr) {
     match expr {
-        &Expr::Atom(v) => script.stack.push(v),
+        &Expr::Atom(v) => script.program.push(OpCode::VAL(v)),
         &Expr::BinaryOperation(ref bop) => {
             compile_expression(script, &bop.r_expr);
             compile_expression(script, &bop.l_expr);
@@ -37,7 +35,6 @@ pub fn compile_script(statements: Vec<Statement>) -> Script {
     for statement in statements {
         match statement {
             Statement::Expression(s) => compile_expression(&mut script, &s),
-            Statement::Nil => (),
         }
     }
     return script;
