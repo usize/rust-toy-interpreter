@@ -2,6 +2,7 @@
 pub enum Value {
     Int(i32),
     Float(f32),
+    Str(&'static str),
     Error(&'static str),
 }
 
@@ -102,6 +103,5 @@ impl Value {
             _               => Value::Error("invalid operation")
         }
     }
-
 }
 

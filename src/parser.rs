@@ -27,6 +27,7 @@ pub struct BinaryOp {
 pub enum Expr {
     Atom(Value),
     BinaryOperation(Box<BinaryOp>),
+    GetName(String),
     Nil,
 }
 
@@ -63,6 +64,7 @@ impl Parser {
         return Expr::Nil;
     }
 
+    // TODO: fix broken binops *should be expr op expr, not atom op expr
     fn parse_binop(&mut self, e1: Expr) -> Expr {
         let op = Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap();
         self.lexer.next_token();
@@ -72,8 +74,7 @@ impl Parser {
 
     fn parse_expression(&mut self) -> Expr {
         match *self.lexer.curr_type() {
-            TokenType::INT => return self.parse_atom(),
-            TokenType::FLOAT => {
+            TokenType::INT | TokenType::FLOAT => {
                 let e1 = self.parse_atom();
                 if self.lexer.next_token() &&
                    self.lexer.current_is_type(TokenType::BINOP) {
@@ -81,6 +82,7 @@ impl Parser {
                 }
                 return e1;
             },
+            TokenType::IDENTIFIER => return Expr::GetName(self.lexer.curr_value()),
             _ => return Expr::Nil
         }
     }

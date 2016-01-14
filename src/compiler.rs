@@ -1,6 +1,7 @@
 use vm::*;
 use lexer::*;
 use parser::*;
+use value::*;
 
 // Everything you need to run some code in the vm
 pub struct Script {
@@ -26,12 +27,16 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
                 BinOp::DIV  => script.program.push(OpCode::DIV),
             }
         },
+        &Expr::GetName(ref n) => script.program.push(OpCode::GETNAME("a")),
         &Expr::Nil => (),
     }
 }
 
 fn compile_assignment(script: &mut Script, deflet: &DefLet) {
-    // TODO: compile this mofo
+    compile_expression(script, &deflet.expr);
+    let name = Value::Str("a");
+    script.program.push(OpCode::VAL(name));
+    script.program.push(OpCode::DEF);
 }
 
 pub fn compile_script(statements: Vec<Statement>) -> Script {
