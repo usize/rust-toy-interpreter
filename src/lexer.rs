@@ -6,6 +6,17 @@ pub enum TokenType {
     INT,
     FLOAT,
     IDENTIFIER,
+    EQUALS,
+    LET,
+    LPAR,
+    RPAR,
+    LCBRACE,
+    RCBRACE,
+    LBRACKET,
+    RBRACKET,
+    COLON,
+    COMMA,
+    PERIOD,
     BINOP
 }
 
@@ -91,7 +102,7 @@ impl Lexer {
     }
 
     fn skip_whitespace(&mut self, line: &str) {
-        while self.chr(line) == ' ' {
+        while self.chr(line) == ' ' && self.cursor < line.len() - 1 {
             self.cursor += 1;
             self.start_pos += 1;
         }
@@ -171,7 +182,12 @@ impl Lexer {
                 }
 
                 // INTS 'N FLOATS
-                if self.chr(line).is_digit(10) {
+                if self.chr(line).is_digit(10) ||
+                   self.chr(line) == '.' && self.peek(line).is_digit(10) ||
+                   self.chr(line) == '-' && self.peek(line).is_digit(10) {
+                    if self.chr(line) == '-' {
+                        self.cursor += 1;
+                    }
                     while self.chr(line).is_digit(10) {
                         self.cursor += 1;
                     }
@@ -193,9 +209,68 @@ impl Lexer {
                     self.add_token(TokenType::BINOP, line);
                     continue;
                 }
-                return Err(format!("unknown symbol: {} , line: {} column: {}",
-                                    &line[self.start_pos..line.len()],
-                                    self.lines, self.start_pos));
+
+                // MISC
+                match self.chr(line) {
+                    '='  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::EQUALS, line);
+                        continue;
+                    },
+                    '('  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::LPAR, line);
+                        continue;
+                    },
+                    ')'  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::RPAR, line);
+                        continue;
+                    },
+                    '{'  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::LCBRACE, line);
+                        continue;
+                    },
+                    '}'  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::RCBRACE, line);
+                        continue;
+                    },
+                    '['  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::LBRACKET, line);
+                        continue;
+                    },
+                    ']'  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::RBRACKET, line);
+                        continue;
+                    },
+                    ':'  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::COLON, line);
+                        continue;
+                    },
+                    ','  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::COMMA, line);
+                        continue;
+                    },
+                    '.'  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::PERIOD, line);
+                        continue;
+                    },
+                    '\n' => break,
+                    '\0' => break,
+                    _    => {
+                        return Err(format!("unknown symbol: {}, ln: {} col: {}",
+                                            &line[self.start_pos..line.len()],
+                                            self.lines, self.start_pos));
+                    }
+                }
+
             }
         }
         return Ok(());
