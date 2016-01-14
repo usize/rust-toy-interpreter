@@ -31,8 +31,15 @@ pub enum Expr {
 }
 
 #[derive(Debug)]
+pub struct DefLet {
+    pub name: String,
+    pub expr: Expr
+}
+
+#[derive(Debug)]
 pub enum Statement {
     Expression(Expr),
+    Assignment(DefLet)
 }
 
 pub struct Parser {
@@ -56,23 +63,46 @@ impl Parser {
         return Expr::Nil;
     }
 
+    fn parse_binop(&mut self, e1: Expr) -> Expr {
+        let op = Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap();
+        self.lexer.next_token();
+        let bop = BinaryOp{l_expr: e1, op: op, r_expr: self.parse_expression()};
+        return Expr::BinaryOperation(Box::new(bop));
+    }
+
     fn parse_expression(&mut self) -> Expr {
-        if self.lexer.tokens().len() > 0 {
-            let e1 = self.parse_atom();
-            if self.lexer.next_token() &&
-               self.lexer.current_is_type(TokenType::BINOP) {
-                let op = Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap();
-                self.lexer.next_token();
-                let bop = BinaryOp{l_expr: e1, op: op, r_expr: self.parse_expression()};
-                return Expr::BinaryOperation(Box::new(bop));
-            }
-            return e1;
+        match *self.lexer.curr_type() {
+            TokenType::INT => return self.parse_atom(),
+            TokenType::FLOAT => {
+                let e1 = self.parse_atom();
+                if self.lexer.next_token() &&
+                   self.lexer.current_is_type(TokenType::BINOP) {
+                    return self.parse_binop(e1);
+                }
+                return e1;
+            },
+            _ => return Expr::Nil
         }
-        return Expr::Nil;
     }
 
     fn parse_statement(&mut self) -> Statement {
-        return Statement::Expression(self.parse_expression());
+        if self.lexer.tokens().len() > 0 {
+            match *self.lexer.curr_type() {
+                TokenType::LET => {
+                   self.lexer.next_token();
+                   self.lexer.match_token(TokenType::IDENTIFIER).unwrap();
+                   let name = self.lexer.curr_value();
+                   self.lexer.next_token();
+                   self.lexer.match_token(TokenType::EQUALS).unwrap();
+                   self.lexer.next_token();
+                   let e = self.parse_expression();
+                   return Statement::Assignment(DefLet{name: name, expr: e});
+
+                },
+                _ => return Statement::Expression(self.parse_expression()),
+            }
+        }
+        return Statement::Expression(Expr::Nil);
     }
 
     fn parse_program(&mut self) -> Vec<Statement> {

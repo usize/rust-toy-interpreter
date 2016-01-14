@@ -30,11 +30,16 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
     }
 }
 
+fn compile_assignment(script: &mut Script, deflet: &DefLet) {
+    // TODO: compile this mofo
+}
+
 pub fn compile_script(statements: Vec<Statement>) -> Script {
     let mut script = Script::new();
     for statement in statements {
         match statement {
             Statement::Expression(s) => compile_expression(&mut script, &s),
+            Statement::Assignment(a) => compile_assignment(&mut script, &a),
         }
     }
     return script;

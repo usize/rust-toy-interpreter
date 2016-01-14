@@ -125,6 +125,13 @@ impl Lexer {
         }
     }
 
+    fn keyword(&mut self, line: &str) -> Option<TokenType> {
+        match &line[self.start_pos..self.cursor] {
+            "let" => Some(TokenType::LET),
+             _ => None
+        }
+    }
+
     // returns true if there is still a "next" token
     pub fn next_token(&mut self) -> bool {
         if self.top + 1 < self.tokens.len() {
@@ -145,6 +152,10 @@ impl Lexer {
 
     pub fn curr_token(&self) -> &Token {
         return &self.tokens[self.top];
+    }
+
+    pub fn curr_type(&self) -> &TokenType {
+        return &self.curr_token().token_type;
     }
 
     pub fn curr_value(&self) -> String {
@@ -177,7 +188,10 @@ impl Lexer {
                     while self.chr(line).is_alphabetic() {
                         self.cursor += 1;
                     }
-                    self.add_token(TokenType::IDENTIFIER, line);
+                    match self.keyword(line) {
+                        Some(tt) => self.add_token(tt, line),
+                        None     => self.add_token(TokenType::IDENTIFIER, line)
+                    }
                     continue;
                 }
 
