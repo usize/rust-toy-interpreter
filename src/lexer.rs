@@ -151,7 +151,7 @@ impl Lexer {
         return Err(format!("expected: {:?} , found: {:?}", t, self.curr_token()));
     }
 
-    pub fn tokenize(&mut self, lines: String) {
+    pub fn tokenize(&mut self, lines: String) -> Result<(), String>{
         for line in lines.lines() {
             self.lines += 1;
             self.start_pos = 0;
@@ -193,9 +193,11 @@ impl Lexer {
                     self.add_token(TokenType::BINOP, line);
                     continue;
                 }
-
-                panic!("unknown symbol");
+                return Err(format!("unknown symbol: {} , line: {} column: {}",
+                                    &line[self.start_pos..line.len()],
+                                    self.lines, self.start_pos));
             }
         }
+        return Ok(());
     }
 }

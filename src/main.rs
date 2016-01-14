@@ -34,12 +34,16 @@ fn main() {
         weak_try!(io::stdout().flush());
 
         for _ in io::stdin().read_line(&mut buffer) {
-            let statements = parser.parse_lines(buffer.clone());
-            println!("Parser: {:?}", &statements);
-            let script = compile_script(statements);
-            vm.load(script.program);
-            vm.run();
-            println!("VM: stack: {:?}, program: {:?}", vm.stack(), vm.program());
+            match parser.parse_lines(buffer.clone()) {
+                Err(msg) => println!("{}", msg),
+                Ok(statements) => {
+                    println!("Parser: {:?}", &statements);
+                    let script = compile_script(statements);
+                    vm.load(script.program);
+                    vm.run();
+                    println!("VM: stack: {:?}, program: {:?}", vm.stack(), vm.program());
+                }
+            }
         }
     }
 }

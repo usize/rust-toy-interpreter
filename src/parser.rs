@@ -82,10 +82,13 @@ impl Parser {
         return program;
     }
 
-    pub fn parse_lines(&mut self, text: String) -> Vec<Statement> {
-        self.lexer.tokenize(text.clone());
+    pub fn parse_lines(&mut self, text: String) -> Result<Vec<Statement>, String> {
+        match self.lexer.tokenize(text.clone()) {
+            Err(msg) => return Err(msg),
+            _ => ()
+        }
         let program = self.parse_program();
         self.lexer.reset();
-        return program;
+        return Ok(program);
     }
 }
