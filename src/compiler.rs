@@ -20,7 +20,7 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
             script.strings.push(n.clone());
             script.program.push(OpCode::GetName(script.strings.len() - 1))
         },
-        &Expr::Nil => (),
+        &Expr::Nil => ()
     }
 }
 
@@ -37,6 +37,7 @@ pub fn compile_script(statements: Vec<Statement>) -> Script {
         match statement {
             Statement::Expression(s) => compile_expression(&mut script, &s),
             Statement::Assignment(a) => compile_assignment(&mut script, &a),
+            Statement::Nil => (),
         }
     }
     return script;

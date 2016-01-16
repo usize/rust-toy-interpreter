@@ -8,6 +8,8 @@ pub enum TokenType {
     Identifier,
     Equals,
     Let,
+    Function,
+    Return,
     LPar,
     RPar,
     LCBrace,
@@ -22,10 +24,10 @@ pub enum TokenType {
 
 #[derive(Debug)]
 pub enum BinOp {
+    Mul,
+    Div,
     Plus,
     Min,
-    Mul,
-    Div
 }
 
 #[derive(Debug)]
@@ -108,12 +110,13 @@ impl Lexer {
         }
     }
 
-    pub fn bin_op(v: &str) -> Option<BinOp> {
+    // Matches a string to a binop, along with its precedence
+    pub fn bin_op(v: &str) -> Option<(BinOp, u8)> {
         match v {
-            "+" => Some(BinOp::Plus),
-            "-" => Some(BinOp::Min),
-            "*" => Some(BinOp::Mul),
-            "/" => Some(BinOp::Div),
+            "+" => Some((BinOp::Plus, 2)),
+            "-" => Some((BinOp::Min, 2)),
+            "*" => Some((BinOp::Mul, 1)),
+            "/" => Some((BinOp::Div, 1)),
             _ => None
         }
     }
@@ -127,7 +130,9 @@ impl Lexer {
 
     fn keyword(&mut self, line: &str) -> Option<TokenType> {
         match &line[self.start_pos..self.cursor] {
-            "let" => Some(TokenType::Let),
+            "let"      => Some(TokenType::Let),
+            "function" => Some(TokenType::Function),
+            "return"   => Some(TokenType::Return),
              _ => None
         }
     }

@@ -3,6 +3,8 @@ pub enum Value {
     Int(i32),
     Float(f32),
     Str(usize),
+    Function(usize),
+    Object(usize),
     Error(&'static str),
 }
 
