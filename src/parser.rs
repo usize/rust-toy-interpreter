@@ -82,7 +82,14 @@ impl Parser {
                 }
                 return e1;
             },
-            TokenType::IDENTIFIER => return Expr::GetName(self.lexer.curr_value()),
+            TokenType::IDENTIFIER => {
+                let e1 = Expr::GetName(self.lexer.curr_value());
+                if self.lexer.next_token() &&
+                   self.lexer.current_is_type(TokenType::BINOP) {
+                    return self.parse_binop(e1);
+                }
+                return e1;
+            },
             _ => return Expr::Nil
         }
     }
