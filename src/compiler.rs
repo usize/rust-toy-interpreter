@@ -6,11 +6,12 @@ use value::*;
 // Everything you need to run some code in the vm
 pub struct Script {
     pub program: Vec<OpCode>,
+    pub strings: Vec<String>
 }
 
 impl Script {
     pub fn new() -> Script {
-        return Script{program: Vec::new()};
+        return Script{program: Vec::new(), strings: Vec::new()};
     }
 }
 
@@ -27,15 +28,18 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
                 BinOp::DIV  => script.program.push(OpCode::DIV),
             }
         },
-        &Expr::GetName(ref n) => script.program.push(OpCode::GETNAME("a")),
+        &Expr::GetName(ref n) => {
+            script.strings.push(n.clone());
+            script.program.push(OpCode::GETNAME(script.strings.len() - 1))
+        },
         &Expr::Nil => (),
     }
 }
 
 fn compile_assignment(script: &mut Script, deflet: &DefLet) {
     compile_expression(script, &deflet.expr);
-    let name = Value::Str("a");
-    script.program.push(OpCode::VAL(name));
+    script.strings.push(deflet.name.clone());
+    script.program.push(OpCode::VAL(Value::Str(script.strings.len() - 1)));
     script.program.push(OpCode::DEF);
 }
 

@@ -11,23 +11,25 @@ pub enum OpCode {
     MUL, // stack.pop() * stack.pop()
     DIV, // stack.pop() / stack.pop()
     DEF, // scopes[stack.pop()] = stack.pop()
-    GETNAME(&'static str), // scopes[stack.pop()] = stack.pop()
+    GETNAME(usize), // scopes[stack.pop()] = stack.pop()
 }
 
 pub struct VM {
     program:    Vec<OpCode>,
+    strings:    Vec<String>,
     //callstack:  Vec<usize>,
     stack:      Vec<Value>,
     ip:         usize,
     running:    bool,
     // TODO: Make real scopes instead of this travesty
-    scopes:     HashMap<&'static str, Value>
+    scopes:     HashMap<String, Value>
 }
 
 impl VM {
     pub fn new() -> VM {
         return VM{
             program: Vec::new(),
+            strings: Vec::new(),
             /*callstack: Vec::new(),*/
             stack: Vec::new(),
             ip: 0,
@@ -36,8 +38,9 @@ impl VM {
         };
     }
 
-    pub fn load(&mut self, program: Vec<OpCode>) {
+    pub fn load(&mut self, program: Vec<OpCode>, strings: Vec<String>) {
         self.program = program;
+        self.strings = strings;
         self.stack = Vec::new();
         self.ip = 0;
     }
@@ -85,13 +88,13 @@ impl VM {
                 OpCode::DIV         => self.div(),
                 OpCode::DEF         => {
                     match self.stack.pop().unwrap() {
-                        Value::Str(name) => {
-                            self.scopes.insert(name, self.stack.pop().unwrap());
+                        Value::Str(n) => {
+                            self.scopes.insert(self.strings[n].clone(), self.stack.pop().unwrap());
                         },
                         _ => self.stack.push(Value::Error("invalid assignment")),
                     }
                 },
-                OpCode::GETNAME(n)  => self.stack.push(self.scopes.get(n).unwrap().clone()),
+                OpCode::GETNAME(n)  => self.stack.push(self.scopes[&self.strings[n]].clone()),
             }
             self.ip += 1;
         }

@@ -2,7 +2,7 @@
 pub enum Value {
     Int(i32),
     Float(f32),
-    Str(&'static str),
+    Str(usize),
     Error(&'static str),
 }
 
