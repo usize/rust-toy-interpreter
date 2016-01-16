@@ -3,21 +3,21 @@
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub enum TokenType {
-    INT,
-    FLOAT,
-    IDENTIFIER,
-    EQUALS,
-    LET,
-    LPAR,
-    RPAR,
-    LCBRACE,
-    RCBRACE,
-    LBRACKET,
-    RBRACKET,
-    COLON,
-    COMMA,
-    PERIOD,
-    BINOP
+    Int,
+    Float,
+    Identifier,
+    Equals,
+    Let,
+    LPar,
+    RPar,
+    LCBrace,
+    RCBrace,
+    LBracket,
+    RBracket,
+    Colon,
+    Comma,
+    Period,
+    BinOp
 }
 
 #[derive(Debug)]
@@ -127,7 +127,7 @@ impl Lexer {
 
     fn keyword(&mut self, line: &str) -> Option<TokenType> {
         match &line[self.start_pos..self.cursor] {
-            "let" => Some(TokenType::LET),
+            "let" => Some(TokenType::Let),
              _ => None
         }
     }
@@ -183,19 +183,19 @@ impl Lexer {
                 // skip whitespace
                 self.skip_whitespace(line);
 
-                // IDENTIFIERS .. KEYWORDS
+                // IdentifierS .. KEYWORDS
                 if self.chr(line).is_alphabetic() {
                     while self.chr(line).is_alphabetic() {
                         self.cursor += 1;
                     }
                     match self.keyword(line) {
                         Some(tt) => self.add_token(tt, line),
-                        None     => self.add_token(TokenType::IDENTIFIER, line)
+                        None     => self.add_token(TokenType::Identifier, line)
                     }
                     continue;
                 }
 
-                // INTS 'N FLOATS
+                // IntS 'N FloatS
                 if self.chr(line).is_digit(10) ||
                    self.chr(line) == '.' && self.peek(line).is_digit(10) ||
                    self.chr(line) == '-' && self.peek(line).is_digit(10) {
@@ -210,17 +210,17 @@ impl Lexer {
                         while self.chr(line).is_digit(10) {
                             self.cursor += 1;
                         }
-                        self.add_token(TokenType::FLOAT, line);
+                        self.add_token(TokenType::Float, line);
                         continue;
                     }
-                    self.add_token(TokenType::INT, line);
+                    self.add_token(TokenType::Int, line);
                     continue;
                 }
 
-                // BINOPS || UNARYOPS
+                // BinOpS || UNARYOPS
                 if self.is_binop(line) {
                     self.cursor += 1;
-                    self.add_token(TokenType::BINOP, line);
+                    self.add_token(TokenType::BinOp, line);
                     continue;
                 }
 
@@ -228,52 +228,52 @@ impl Lexer {
                 match self.chr(line) {
                     '='  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::EQUALS, line);
+                        self.add_token(TokenType::Equals, line);
                         continue;
                     },
                     '('  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::LPAR, line);
+                        self.add_token(TokenType::LPar, line);
                         continue;
                     },
                     ')'  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::RPAR, line);
+                        self.add_token(TokenType::RPar, line);
                         continue;
                     },
                     '{'  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::LCBRACE, line);
+                        self.add_token(TokenType::LCBrace, line);
                         continue;
                     },
                     '}'  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::RCBRACE, line);
+                        self.add_token(TokenType::RCBrace, line);
                         continue;
                     },
                     '['  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::LBRACKET, line);
+                        self.add_token(TokenType::LBracket, line);
                         continue;
                     },
                     ']'  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::RBRACKET, line);
+                        self.add_token(TokenType::RBracket, line);
                         continue;
                     },
                     ':'  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::COLON, line);
+                        self.add_token(TokenType::Colon, line);
                         continue;
                     },
                     ','  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::COMMA, line);
+                        self.add_token(TokenType::Comma, line);
                         continue;
                     },
                     '.'  => {
                         self.cursor += 1;
-                        self.add_token(TokenType::PERIOD, line);
+                        self.add_token(TokenType::Period, line);
                         continue;
                     },
                     '\n' => break,

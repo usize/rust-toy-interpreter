@@ -53,11 +53,11 @@ impl Parser {
     }
 
     fn parse_atom(&mut self) -> Expr {
-        if self.lexer.current_is_type(TokenType::INT) {
+        if self.lexer.current_is_type(TokenType::Int) {
             let int = self.lexer.curr_value().parse::<i32>().unwrap();
             return Expr::Atom(Value::Int(int));
         }
-        if self.lexer.current_is_type(TokenType::FLOAT) {
+        if self.lexer.current_is_type(TokenType::Float) {
             let float = self.lexer.curr_value().parse::<f32>().unwrap();
             return Expr::Atom(Value::Float(float));
         }
@@ -74,18 +74,18 @@ impl Parser {
 
     fn parse_expression(&mut self) -> Expr {
         match *self.lexer.curr_type() {
-            TokenType::INT | TokenType::FLOAT => {
+            TokenType::Int | TokenType::Float => {
                 let e1 = self.parse_atom();
                 if self.lexer.next_token() &&
-                   self.lexer.current_is_type(TokenType::BINOP) {
+                   self.lexer.current_is_type(TokenType::BinOp) {
                     return self.parse_binop(e1);
                 }
                 return e1;
             },
-            TokenType::IDENTIFIER => {
+            TokenType::Identifier => {
                 let e1 = Expr::GetName(self.lexer.curr_value());
                 if self.lexer.next_token() &&
-                   self.lexer.current_is_type(TokenType::BINOP) {
+                   self.lexer.current_is_type(TokenType::BinOp) {
                     return self.parse_binop(e1);
                 }
                 return e1;
@@ -97,12 +97,12 @@ impl Parser {
     fn parse_statement(&mut self) -> Statement {
         if self.lexer.tokens().len() > 0 {
             match *self.lexer.curr_type() {
-                TokenType::LET => {
+                TokenType::Let => {
                    self.lexer.next_token();
-                   self.lexer.match_token(TokenType::IDENTIFIER).unwrap();
+                   self.lexer.match_token(TokenType::Identifier).unwrap();
                    let name = self.lexer.curr_value();
                    self.lexer.next_token();
-                   self.lexer.match_token(TokenType::EQUALS).unwrap();
+                   self.lexer.match_token(TokenType::Equals).unwrap();
                    self.lexer.next_token();
                    let e = self.parse_expression();
                    return Statement::Assignment(DefLet{name: name, expr: e});
