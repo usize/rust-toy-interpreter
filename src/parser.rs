@@ -64,7 +64,7 @@ impl Parser {
         return Expr::Nil;
     }
 
-    // TODO: fix broken binops *should be expr op expr, not atom op expr
+    // TODO: precedences ~!!@
     fn parse_binop(&mut self, e1: Expr) -> Expr {
         let op = Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap();
         self.lexer.next_token();
