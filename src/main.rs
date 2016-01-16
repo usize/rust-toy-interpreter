@@ -30,7 +30,7 @@ fn main() {
     loop {
         let mut buffer = String::new();
 
-        weak_try!(io::stdout().write(b"js> "));
+        weak_try!(io::stdout().write(b"Harvey> "));
         weak_try!(io::stdout().flush());
 
         for _ in io::stdin().read_line(&mut buffer) {
