@@ -3,18 +3,6 @@ use lexer::*;
 use parser::*;
 use value::*;
 
-// Everything you need to run some code in the vm
-pub struct Script {
-    pub program: Vec<OpCode>,
-    pub strings: Vec<String>
-}
-
-impl Script {
-    pub fn new() -> Script {
-        return Script{program: Vec::new(), strings: Vec::new()};
-    }
-}
-
 fn compile_expression(script: &mut Script, expr: &Expr) {
     match expr {
         &Expr::Atom(v) => script.program.push(OpCode::Val(v)),

@@ -39,7 +39,7 @@ fn main() {
                 Ok(statements) => {
                     println!("Parser: {:?}", &statements);
                     let script = compile_script(statements);
-                    vm.load(script.program, script.strings);
+                    vm.load(script);
                     vm.run();
                     println!("VM: stack: {:?}, program: {:?}", vm.stack(), vm.program());
                 }

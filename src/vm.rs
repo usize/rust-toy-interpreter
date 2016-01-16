@@ -3,6 +3,18 @@
 use std::collections::HashMap;
 use value::*;
 
+// Everything you need to run some code in the vm
+pub struct Script {
+    pub program: Vec<OpCode>,
+    pub strings: Vec<String>
+}
+
+impl Script {
+    pub fn new() -> Script {
+        return Script{program: Vec::new(), strings: Vec::new()};
+    }
+}
+
 #[derive(Debug)]
 pub enum OpCode {
     Val(Value), // stack.push(Value)
@@ -36,9 +48,9 @@ impl VM {
         };
     }
 
-    pub fn load(&mut self, program: Vec<OpCode>, strings: Vec<String>) {
-        self.program = program;
-        self.strings = strings;
+    pub fn load(&mut self, script: Script) {
+        self.program = script.program;
+        self.strings = script.strings;
         self.stack = Vec::new();
         self.ip = 0;
     }
@@ -87,7 +99,8 @@ impl VM {
                 OpCode::Def         => {
                     match self.stack.pop().unwrap() {
                         Value::Str(n) => {
-                            self.scopes.insert(self.strings[n].clone(), self.stack.pop().unwrap());
+                            self.scopes.insert(self.strings[n].clone(),
+                                               self.stack.pop().unwrap());
                         },
                         _ => self.stack.push(Value::Error("invalid assignment")),
                     }
