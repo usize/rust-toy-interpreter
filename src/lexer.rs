@@ -22,10 +22,10 @@ pub enum TokenType {
 
 #[derive(Debug)]
 pub enum BinOp {
-    PLUS,
-    MIN,
-    MUL,
-    DIV
+    Plus,
+    Min,
+    Mul,
+    Div
 }
 
 #[derive(Debug)]
@@ -110,10 +110,10 @@ impl Lexer {
 
     pub fn bin_op(v: &str) -> Option<BinOp> {
         match v {
-            "+" => Some(BinOp::PLUS),
-            "-" => Some(BinOp::MIN),
-            "*" => Some(BinOp::MUL),
-            "/" => Some(BinOp::DIV),
+            "+" => Some(BinOp::Plus),
+            "-" => Some(BinOp::Min),
+            "*" => Some(BinOp::Mul),
+            "/" => Some(BinOp::Div),
             _ => None
         }
     }

@@ -5,19 +5,18 @@ use value::*;
 
 #[derive(Debug)]
 pub enum OpCode {
-    VAL(Value), // stack.push(Value)
-    ADD, // stack.pop() + stack.pop()
-    SUB, // stack.pop() - stack.pop()
-    MUL, // stack.pop() * stack.pop()
-    DIV, // stack.pop() / stack.pop()
-    DEF, // scopes[stack.pop()] = stack.pop()
-    GETNAME(usize), // scopes[stack.pop()] = stack.pop()
+    Val(Value), // stack.push(Value)
+    Add, // stack.pop() + stack.pop()
+    Sub, // stack.pop() - stack.pop()
+    Mul, // stack.pop() * stack.pop()
+    Div, // stack.pop() / stack.pop()
+    Def, // scopes[stack.pop()] = stack.pop()
+    GetName(usize), // scopes[stack.pop()] = stack.pop()
 }
 
 pub struct VM {
     program:    Vec<OpCode>,
     strings:    Vec<String>,
-    //callstack:  Vec<usize>,
     stack:      Vec<Value>,
     ip:         usize,
     running:    bool,
@@ -30,7 +29,6 @@ impl VM {
         return VM{
             program: Vec::new(),
             strings: Vec::new(),
-            /*callstack: Vec::new(),*/
             stack: Vec::new(),
             ip: 0,
             running: false,
@@ -81,12 +79,12 @@ impl VM {
         self.running = true;
         while self.running && self.ip < self.program.len() {
             match self.program[self.ip] {
-                OpCode::VAL(v)      => self.stack.push(v),
-                OpCode::ADD         => self.add(),
-                OpCode::SUB         => self.sub(),
-                OpCode::MUL         => self.mul(),
-                OpCode::DIV         => self.div(),
-                OpCode::DEF         => {
+                OpCode::Val(v)      => self.stack.push(v),
+                OpCode::Add         => self.add(),
+                OpCode::Sub         => self.sub(),
+                OpCode::Mul         => self.mul(),
+                OpCode::Div         => self.div(),
+                OpCode::Def         => {
                     match self.stack.pop().unwrap() {
                         Value::Str(n) => {
                             self.scopes.insert(self.strings[n].clone(), self.stack.pop().unwrap());
@@ -94,7 +92,7 @@ impl VM {
                         _ => self.stack.push(Value::Error("invalid assignment")),
                     }
                 },
-                OpCode::GETNAME(n)  => self.stack.push(self.scopes[&self.strings[n]].clone()),
+                OpCode::GetName(n)  => self.stack.push(self.scopes[&self.strings[n]].clone()),
             }
             self.ip += 1;
         }

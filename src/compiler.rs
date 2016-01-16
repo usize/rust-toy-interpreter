@@ -17,20 +17,20 @@ impl Script {
 
 fn compile_expression(script: &mut Script, expr: &Expr) {
     match expr {
-        &Expr::Atom(v) => script.program.push(OpCode::VAL(v)),
+        &Expr::Atom(v) => script.program.push(OpCode::Val(v)),
         &Expr::BinaryOperation(ref bop) => {
             compile_expression(script, &bop.r_expr);
             compile_expression(script, &bop.l_expr);
             match bop.op {
-                BinOp::PLUS => script.program.push(OpCode::ADD),
-                BinOp::MIN  => script.program.push(OpCode::SUB),
-                BinOp::MUL  => script.program.push(OpCode::MUL),
-                BinOp::DIV  => script.program.push(OpCode::DIV),
+                BinOp::Plus => script.program.push(OpCode::Add),
+                BinOp::Min  => script.program.push(OpCode::Sub),
+                BinOp::Mul  => script.program.push(OpCode::Mul),
+                BinOp::Div  => script.program.push(OpCode::Div),
             }
         },
         &Expr::GetName(ref n) => {
             script.strings.push(n.clone());
-            script.program.push(OpCode::GETNAME(script.strings.len() - 1))
+            script.program.push(OpCode::GetName(script.strings.len() - 1))
         },
         &Expr::Nil => (),
     }
@@ -39,8 +39,8 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
 fn compile_assignment(script: &mut Script, deflet: &DefLet) {
     compile_expression(script, &deflet.expr);
     script.strings.push(deflet.name.clone());
-    script.program.push(OpCode::VAL(Value::Str(script.strings.len() - 1)));
-    script.program.push(OpCode::DEF);
+    script.program.push(OpCode::Val(Value::Str(script.strings.len() - 1)));
+    script.program.push(OpCode::Def);
 }
 
 pub fn compile_script(statements: Vec<Statement>) -> Script {
