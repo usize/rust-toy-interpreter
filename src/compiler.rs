@@ -26,7 +26,13 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
             let o = Object::Function{args: args.clone(), body: s.program};
             script.program.push(OpCode::Val(Value::Function(o)));
         },
-        &Expr::Call(ref args) => (),
+        &Expr::Call(ref args) => {
+            for e in args {
+                compile_expression(script, e);
+            }
+            script.program.push(OpCode::Val(Value::Int((args.len() as i32) - 1)));
+            script.program.push(OpCode::Call);
+        },
         &Expr::Nil => ()
     }
 }

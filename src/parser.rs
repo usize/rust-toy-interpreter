@@ -66,17 +66,17 @@ impl Parser {
                     match *self.lexer.curr_type() {
                         TokenType::BinOp => return self.parse_binop(e1),
                         TokenType::LPar  => {
-                            let mut exprStack = Vec::new();
-                            exprStack.push(e1);
+                            let mut expr_stack = Vec::new();
+                            expr_stack.push(e1);
                             self.lexer.next_token();
                             while !self.lexer.current_is_type(TokenType::RPar) {
-                                exprStack.push(self.parse_expression());
+                                expr_stack.push(self.parse_expression());
                                 self.lexer.next_token();
                                 if self.lexer.current_is_type(TokenType::Comma) {
                                     self.lexer.next_token();
                                 }
                             }
-                            return Expr::Call(exprStack);
+                            return Expr::Call(expr_stack);
                         },
                         _ => return e1
                     }
