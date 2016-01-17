@@ -1,7 +1,8 @@
-use vm::*;
-use lexer::*;
-use parser::*;
-use value::*;
+use vm::Script;
+use lexer::BinOp;
+use parser::{Statement, DefLet, Expr};
+use opcode::OpCode;
+use value::Value;
 
 fn compile_expression(script: &mut Script, expr: &Expr) {
     match expr {
@@ -35,7 +36,7 @@ pub fn compile_script(statements: Vec<Statement>) -> Script {
         match statement {
             Statement::Expression(s) => compile_expression(&mut script, &s),
             Statement::Assignment(a) => compile_assignment(&mut script, &a),
-            Statement::Nil => (),
+            Statement::Function(args, body)   => (),
         }
     }
     return script;

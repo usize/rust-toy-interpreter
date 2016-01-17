@@ -1,10 +1,11 @@
+use object::Object;
+
 #[derive(Debug, Clone)]
 pub enum Value {
     Int(i32),
     Float(f32),
     Str(String),
-    Function(usize),
-    Object(usize),
+    Function(Object),
     Error(&'static str),
 }
 

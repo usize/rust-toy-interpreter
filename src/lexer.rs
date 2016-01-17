@@ -2,6 +2,7 @@
 
 #[derive(Debug)]
 #[derive(PartialEq)]
+#[derive(Clone)]
 pub enum TokenType {
     Int,
     Float,
@@ -32,6 +33,7 @@ pub enum BinOp {
 }
 
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct Token {
     token_type : TokenType,
     value      : String,
@@ -59,6 +61,16 @@ impl Lexer {
     pub fn new() -> Lexer {
         return Lexer{
             tokens:     Vec::new(),
+            lines:      0,
+            start_pos:  0,
+            cursor:     0,
+            top:        0,
+        }
+    }
+
+    pub fn from(tokens: Vec<Token>) -> Lexer {
+        return Lexer{
+            tokens:     tokens,
             lines:      0,
             start_pos:  0,
             cursor:     0,
@@ -154,6 +166,10 @@ impl Lexer {
             return true;
         }
         return false;
+    }
+
+    pub fn tokens_remaining(&self) -> usize {
+        return (self.tokens.len() - 1) - self.top;
     }
 
     pub fn curr_token(&self) -> &Token {

@@ -1,8 +1,6 @@
-trait Object {
-    fn set_property(&mut self, name: String, value: Value);
-    fn get_property(&mut self, name: String) -> Value;
-}
+use opcode::OpCode;
 
-trait Callable {
-    fn call(&self, args: [Value]);
+#[derive(Debug, Clone)]
+pub enum Object {
+    Function{body: Vec<OpCode>, args: Vec<String>}
 }

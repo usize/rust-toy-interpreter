@@ -6,6 +6,8 @@ use vm::*;
 
 mod compiler;
 mod parser;
+mod opcode;
+mod object;
 mod lexer;
 mod value;
 mod vm;

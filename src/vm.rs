@@ -1,7 +1,8 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
-use value::*;
+use opcode::OpCode;
+use value::Value;
 
 // Everything you need to run some code in the vm
 pub struct Script {
@@ -12,17 +13,6 @@ impl Script {
     pub fn new() -> Script {
         return Script{program: Vec::new()};
     }
-}
-
-#[derive(Debug)]
-pub enum OpCode {
-    Val(Value), // stack.push(Value)
-    Add, // stack.pop() + stack.pop()
-    Sub, // stack.pop() - stack.pop()
-    Mul, // stack.pop() * stack.pop()
-    Div, // stack.pop() / stack.pop()
-    Def, // scopes[stack.pop()] = stack.pop()
-    GetName(String), // scopes[String] = stack.pop()
 }
 
 pub struct VM {
@@ -93,6 +83,7 @@ impl VM {
                     }
                 },
                 OpCode::GetName(ref n)  => self.stack.push(self.scopes[n].clone()),
+                OpCode::Call => (),
             }
             self.ip += 1;
         }
