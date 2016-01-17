@@ -5,7 +5,7 @@ pub enum Value {
     Int(i32),
     Float(f32),
     Str(String),
-    Function(Object),
+    Object(Object),
     Error(&'static str),
 }
 

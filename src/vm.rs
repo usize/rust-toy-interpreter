@@ -1,19 +1,9 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
+use object::Object;
 use opcode::OpCode;
 use value::Value;
-
-// Everything you need to run some code in the vm
-pub struct Script {
-    pub program: Vec<OpCode>,
-}
-
-impl Script {
-    pub fn new() -> Script {
-        return Script{program: Vec::new()};
-    }
-}
 
 pub struct VM {
     program:    Vec<OpCode>,
@@ -35,8 +25,8 @@ impl VM {
         };
     }
 
-    pub fn load(&mut self, script: Script) {
-        self.program = script.program;
+    pub fn load(&mut self, program: Vec<OpCode>) {
+        self.program = program;
         self.stack = Vec::new();
         self.ip = 0;
     }
@@ -83,7 +73,29 @@ impl VM {
                     }
                 },
                 OpCode::GetName(ref n)  => self.stack.push(self.scopes[n].clone()),
-                OpCode::Call => (),
+                OpCode::Call => {
+                    let mut args_len = 0;
+                    match self.stack.pop().unwrap() {
+                        Value::Int(i) => args_len = i,
+                        _ => ()
+                    }
+                    for _ in 0 .. args_len {
+                        self.stack.pop();
+                    }
+                    match self.stack.pop().unwrap() {
+                        Value::Object(o) => {
+                            match o {
+                                Object::Function{args:_, body} => {
+                                    let mut frame = VM::new();
+                                    frame.load(body);
+                                    frame.run();
+                                    self.stack.push(frame.stack()[0].clone());
+                                }
+                            }
+                        },
+                        _ => () // TODO: Error, should be using traits here I think
+                    }
+                },
             }
             self.ip += 1;
         }
