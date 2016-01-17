@@ -79,21 +79,30 @@ impl VM {
                         Value::Int(i) => args_len = i,
                         _ => ()
                     }
+                    let mut arg_values = Vec::new();
                     for _ in 0 .. args_len {
-                        self.stack.pop();
+                        arg_values.push(self.stack.pop().unwrap());
                     }
                     match self.stack.pop().unwrap() {
                         Value::Object(o) => {
                             match o {
-                                Object::Function{args:_, body} => {
+                                Object::Function{args, body} => {
                                     let mut frame = VM::new();
+                                    for arg in args {
+                                        if args_len > 0 {
+                                            frame.scopes.insert(arg.clone(), arg_values.pop().unwrap());
+                                            args_len -= 1;
+                                        } else {
+                                            frame.scopes.insert(arg.clone(), Value::Undefined);
+                                        }
+                                    }
                                     frame.load(body);
                                     frame.run();
                                     self.stack.push(frame.stack()[0].clone());
                                 }
                             }
                         },
-                        _ => () // TODO: Error, should be using traits here I think
+                        _ => self.stack.push(Value::Error("invalid call")),
                     }
                 },
             }

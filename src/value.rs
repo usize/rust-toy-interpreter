@@ -6,6 +6,7 @@ pub enum Value {
     Float(f32),
     Str(String),
     Object(Object),
+    Undefined,
     Error(&'static str),
 }
 
