@@ -1,21 +1,6 @@
 use lexer::*;
 use value::*;
 
-/**
- *
- * program ->
- *  [
- *      Statement ->
- *          Expression
- *              Expression ->
- *                  Atom |
- *                  BinOp
- *                      BinOp ->
- *                          Atom BinOp Expression
- *  ]
- *
- **/
-
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct BinaryOp {
@@ -62,50 +47,52 @@ impl Parser {
     }
 
     fn parse_term(&mut self) -> Expr {
-        if self.lexer.current_is_type(TokenType::Int) {
-            let int = self.lexer.curr_value().parse::<i32>().unwrap();
-            return Expr::Atom(Value::Int(int));
-        }
-        if self.lexer.current_is_type(TokenType::Float) {
-            let float = self.lexer.curr_value().parse::<f32>().unwrap();
-            return Expr::Atom(Value::Float(float));
-        }
-        if self.lexer.current_is_type(TokenType::Str) {
-            return Expr::Atom(Value::Str(self.lexer.curr_value()));
-        }
-        if self.lexer.current_is_type(TokenType::Identifier) {
-            let e1 = Expr::GetName(self.lexer.curr_value());
-            if self.lexer.next_token() &&
-               self.lexer.current_is_type(TokenType::BinOp) {
-                return self.parse_binop(e1);
-            }
-            return e1;
-        }
-        if self.lexer.current_is_type(TokenType::LPar) {
-            self.lexer.next_token();
-            let e = self.parse_expression();
-            self.lexer.match_token(TokenType::RPar).unwrap();
-            return e;
-        }
-        if self.lexer.current_is_type(TokenType::Function) {
-            self.lexer.next_token();
-            self.lexer.match_token(TokenType::LPar).unwrap();
-            self.lexer.next_token();
-            let mut args = Vec::new();
-            while self.lexer.current_is_type(TokenType::Identifier) {
-                args.push(self.lexer.curr_value());
-                 self.lexer.next_token();
-                 if self.lexer.current_is_type(TokenType::Comma) {
+        match *self.lexer.curr_type() {
+            TokenType::Int => {
+                let int = self.lexer.curr_value().parse::<i32>().unwrap();
+                return Expr::Atom(Value::Int(int));
+            },
+            TokenType::Float => {
+                let float = self.lexer.curr_value().parse::<f32>().unwrap();
+                return Expr::Atom(Value::Float(float));
+            },
+            TokenType::Str => {
+                return Expr::Atom(Value::Str(self.lexer.curr_value()));
+            },
+            TokenType::Identifier => {
+                let e1 = Expr::GetName(self.lexer.curr_value());
+                if self.lexer.next_token() &&
+                   self.lexer.current_is_type(TokenType::BinOp) {
+                    return self.parse_binop(e1);
+                }
+                return e1;
+            },
+            TokenType::LPar => {
+                self.lexer.next_token();
+                let e = self.parse_expression();
+                self.lexer.match_token(TokenType::RPar).unwrap();
+                return e;
+            },
+            TokenType::Function => {
+                self.lexer.next_token();
+                self.lexer.match_token(TokenType::LPar).unwrap();
+                self.lexer.next_token();
+                let mut args = Vec::new();
+                while self.lexer.current_is_type(TokenType::Identifier) {
+                    args.push(self.lexer.curr_value());
                      self.lexer.next_token();
-                 }
-            }
-            self.lexer.match_token(TokenType::RPar).unwrap();
-            self.lexer.next_token();
-            let body = self.parse_block();
-            self.lexer.next_token();
-            return Expr::Function(args, body);
+                     if self.lexer.current_is_type(TokenType::Comma) {
+                         self.lexer.next_token();
+                     }
+                }
+                self.lexer.match_token(TokenType::RPar).unwrap();
+                self.lexer.next_token();
+                let body = self.parse_block();
+                self.lexer.next_token();
+                return Expr::Function(args, body);
+            },
+            _ => Expr::Nil
         }
-        return Expr::Nil;
     }
 
     // TODO: precedences ~!!@
