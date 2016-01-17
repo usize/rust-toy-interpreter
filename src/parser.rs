@@ -16,6 +16,7 @@ pub enum Expr {
     BinaryOperation(Box<BinaryOp>),
     GetName(String),
     Function(Vec<String>, Vec<Statement>),
+    Call(Vec<Expr>),
     Nil,
 }
 
@@ -61,9 +62,24 @@ impl Parser {
             },
             TokenType::Identifier => {
                 let e1 = Expr::GetName(self.lexer.curr_value());
-                if self.lexer.next_token() &&
-                   self.lexer.current_is_type(TokenType::BinOp) {
-                    return self.parse_binop(e1);
+                if self.lexer.next_token() {
+                    match *self.lexer.curr_type() {
+                        TokenType::BinOp => return self.parse_binop(e1),
+                        TokenType::LPar  => {
+                            let mut exprStack = Vec::new();
+                            exprStack.push(e1);
+                            self.lexer.next_token();
+                            while !self.lexer.current_is_type(TokenType::RPar) {
+                                exprStack.push(self.parse_expression());
+                                self.lexer.next_token();
+                                if self.lexer.current_is_type(TokenType::Comma) {
+                                    self.lexer.next_token();
+                                }
+                            }
+                            return Expr::Call(exprStack);
+                        },
+                        _ => return e1
+                    }
                 }
                 return e1;
             },

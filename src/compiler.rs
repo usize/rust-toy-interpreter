@@ -21,11 +21,12 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
         &Expr::GetName(ref n) => {
             script.program.push(OpCode::GetName(n.clone()))
         },
-        &Expr::Function(ref args, ref body)   => {
+        &Expr::Function(ref args, ref body) => {
             let s = compile_script(body.clone());
             let o = Object::Function{args: args.clone(), body: s.program};
             script.program.push(OpCode::Val(Value::Function(o)));
         },
+        &Expr::Call(ref args) => (),
         &Expr::Nil => ()
     }
 }
