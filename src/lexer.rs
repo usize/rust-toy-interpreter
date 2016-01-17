@@ -5,6 +5,7 @@
 pub enum TokenType {
     Int,
     Float,
+    Str,
     Identifier,
     Equals,
     Let,
@@ -188,7 +189,22 @@ impl Lexer {
                 // skip whitespace
                 self.skip_whitespace(line);
 
-                // IdentifierS .. KEYWORDS
+                // Strings
+                if self.chr(line) == '"' || self.chr(line) == '\'' {
+                    let delim = self.chr(line);
+                    self.start_pos += 1;
+                    self.cursor += 1;
+                    // TODO: handle escaping
+                    while self.chr(line) != delim {
+                        self.cursor += 1;
+                    }
+                    self.add_token(TokenType::Str, line);
+                    self.start_pos += 1;
+                    self.cursor += 1;
+                    continue;
+                }
+
+                // Identifiers .. Keywords
                 if self.chr(line).is_alphabetic() {
                     while self.chr(line).is_alphabetic() {
                         self.cursor += 1;
