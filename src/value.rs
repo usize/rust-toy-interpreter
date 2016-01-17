@@ -1,8 +1,8 @@
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub enum Value {
     Int(i32),
     Float(f32),
-    Str(usize),
+    Str(String),
     Function(usize),
     Object(usize),
     Error(&'static str),

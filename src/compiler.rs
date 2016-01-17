@@ -5,7 +5,7 @@ use value::*;
 
 fn compile_expression(script: &mut Script, expr: &Expr) {
     match expr {
-        &Expr::Atom(v) => script.program.push(OpCode::Val(v)),
+        &Expr::Atom(ref v) => script.program.push(OpCode::Val(v.clone())),
         &Expr::BinaryOperation(ref bop) => {
             compile_expression(script, &bop.r_expr);
             compile_expression(script, &bop.l_expr);
@@ -17,8 +17,7 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
             }
         },
         &Expr::GetName(ref n) => {
-            script.strings.push(n.clone());
-            script.program.push(OpCode::GetName(script.strings.len() - 1))
+            script.program.push(OpCode::GetName(n.clone()))
         },
         &Expr::Nil => ()
     }
@@ -26,8 +25,7 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
 
 fn compile_assignment(script: &mut Script, deflet: &DefLet) {
     compile_expression(script, &deflet.expr);
-    script.strings.push(deflet.name.clone());
-    script.program.push(OpCode::Val(Value::Str(script.strings.len() - 1)));
+    script.program.push(OpCode::Val(Value::Str(deflet.name.clone())));
     script.program.push(OpCode::Def);
 }
 

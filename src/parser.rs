@@ -62,6 +62,9 @@ impl Parser {
             let float = self.lexer.curr_value().parse::<f32>().unwrap();
             return Expr::Atom(Value::Float(float));
         }
+        if self.lexer.current_is_type(TokenType::Str) {
+            return Expr::Atom(Value::Str(self.lexer.curr_value()));
+        }
         if self.lexer.current_is_type(TokenType::Identifier) {
             let e1 = Expr::GetName(self.lexer.curr_value());
             if self.lexer.next_token() &&
