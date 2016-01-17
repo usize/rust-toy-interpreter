@@ -21,6 +21,11 @@ fn compile_expression(script: &mut Script, expr: &Expr) {
         &Expr::GetName(ref n) => {
             script.program.push(OpCode::GetName(n.clone()))
         },
+        &Expr::Function(ref args, ref body)   => {
+            let s = compile_script(body.clone());
+            let o = Object::Function{args: args.clone(), body: s.program};
+            script.program.push(OpCode::Val(Value::Function(o)));
+        },
         &Expr::Nil => ()
     }
 }
@@ -37,11 +42,6 @@ pub fn compile_script(statements: Vec<Statement>) -> Script {
         match statement {
             Statement::Expression(s) => compile_expression(&mut script, &s),
             Statement::Assignment(a) => compile_assignment(&mut script, &a),
-            Statement::Function(args, body)   => {
-                let s = compile_script(body);
-                let o = Object::Function{args: args, body: s.program};
-                script.program.push(OpCode::Val(Value::Function(o)));
-            },
         }
     }
     return script;

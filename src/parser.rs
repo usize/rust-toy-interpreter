@@ -17,6 +17,7 @@ use value::*;
  **/
 
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct BinaryOp {
     pub l_expr: Expr,
     pub op: BinOp,
@@ -24,24 +25,27 @@ pub struct BinaryOp {
 }
 
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum Expr {
     Atom(Value),
     BinaryOperation(Box<BinaryOp>),
     GetName(String),
+    Function(Vec<String>, Vec<Statement>),
     Nil,
 }
 
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct DefLet {
     pub name: String,
     pub expr: Expr
 }
 
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum Statement {
     Expression(Expr),
     Assignment(DefLet),
-    Function(Vec<String>, Vec<Statement>),
 }
 
 pub struct Parser {
@@ -83,6 +87,24 @@ impl Parser {
             self.lexer.match_token(TokenType::RPar).unwrap();
             return e;
         }
+        if self.lexer.current_is_type(TokenType::Function) {
+            self.lexer.next_token();
+            self.lexer.match_token(TokenType::LPar).unwrap();
+            self.lexer.next_token();
+            let mut args = Vec::new();
+            while self.lexer.current_is_type(TokenType::Identifier) {
+                args.push(self.lexer.curr_value());
+                 self.lexer.next_token();
+                 if self.lexer.current_is_type(TokenType::Comma) {
+                     self.lexer.next_token();
+                 }
+            }
+            self.lexer.match_token(TokenType::RPar).unwrap();
+            self.lexer.next_token();
+            let body = self.parse_block();
+            self.lexer.next_token();
+            return Expr::Function(args, body);
+        }
         return Expr::Nil;
     }
 
@@ -115,24 +137,6 @@ impl Parser {
                self.lexer.next_token();
                let e = self.parse_expression();
                return Statement::Assignment(DefLet{name: name, expr: e});
-            },
-            TokenType::Function => {
-                self.lexer.next_token();
-                self.lexer.match_token(TokenType::LPar).unwrap();
-                self.lexer.next_token();
-                let mut args = Vec::new();
-                while self.lexer.current_is_type(TokenType::Identifier) {
-                    args.push(self.lexer.curr_value());
-                     self.lexer.next_token();
-                     if self.lexer.current_is_type(TokenType::Comma) {
-                         self.lexer.next_token();
-                     }
-                }
-                self.lexer.match_token(TokenType::RPar).unwrap();
-                self.lexer.next_token();
-                let body = self.parse_block();
-                self.lexer.next_token();
-                return Statement::Function(args, body);
             },
             _ => return Statement::Expression(self.parse_expression()),
         }

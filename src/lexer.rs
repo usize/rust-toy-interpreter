@@ -25,6 +25,7 @@ pub enum TokenType {
 }
 
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum BinOp {
     Mul,
     Div,
