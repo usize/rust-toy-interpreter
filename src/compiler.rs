@@ -3,6 +3,7 @@ use lexer::BinOp;
 use parser::{Statement, DefLet, Expr};
 use opcode::OpCode;
 use value::Value;
+use object::Object;
 
 fn compile_expression(script: &mut Script, expr: &Expr) {
     match expr {
@@ -36,7 +37,11 @@ pub fn compile_script(statements: Vec<Statement>) -> Script {
         match statement {
             Statement::Expression(s) => compile_expression(&mut script, &s),
             Statement::Assignment(a) => compile_assignment(&mut script, &a),
-            Statement::Function(args, body)   => (),
+            Statement::Function(args, body)   => {
+                let s = compile_script(body);
+                let o = Object::Function{args: args, body: s.program};
+                script.program.push(OpCode::Val(Value::Function(o)));
+            },
         }
     }
     return script;
