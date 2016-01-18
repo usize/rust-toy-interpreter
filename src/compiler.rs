@@ -20,10 +20,17 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
         &Expr::GetName(ref n) => {
             script.push(OpCode::GetName(n.clone()))
         },
-        &Expr::Function(ref args, ref body) => {
+        &Expr::Function{ref name, ref args, ref body} => {
             let s = compile_script(body.clone());
             let o = Object::Function{args: args.clone(), body: s};
             script.push(OpCode::Val(Value::Object(o)));
+            match *name {
+                Some(ref v) => {
+                    script.push(OpCode::Val(Value::Str(v.clone())));
+                    script.push(OpCode::Def);
+                },
+                None => ()
+            }
         },
         &Expr::Call(ref args) => {
             for e in args {

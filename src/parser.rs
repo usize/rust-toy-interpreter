@@ -15,7 +15,7 @@ pub enum Expr {
     Atom(Value),
     BinaryOperation(Box<BinaryOp>),
     GetName(String),
-    Function(Vec<String>, Vec<Statement>),
+    Function{name: Option<String>, args: Vec<String>, body: Vec<Statement>},
     Call(Vec<Expr>),
     Nil,
 }
@@ -91,6 +91,13 @@ impl Parser {
             },
             TokenType::Function => {
                 self.lexer.next_token();
+                let name : Option<String>;
+                if self.lexer.current_is_type(TokenType::Identifier) {
+                    name = Some(self.lexer.curr_value());
+                    self.lexer.next_token();
+                } else {
+                    name = None;
+                }
                 try!(self.lexer.match_token(TokenType::LPar));
                 self.lexer.next_token();
                 let mut args = Vec::new();
@@ -105,7 +112,7 @@ impl Parser {
                 self.lexer.next_token();
                 let body = try!(self.parse_block());
                 self.lexer.next_token();
-                return Ok(Expr::Function(args, body));
+                return Ok(Expr::Function{name: name, args: args, body: body});
             },
             _ => Ok(Expr::Nil)
         }
