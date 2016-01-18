@@ -69,7 +69,12 @@ impl VM {
                         _ => self.stack.push(Value::Error("invalid assignment")),
                     }
                 },
-                OpCode::GetName(ref n)  => self.stack.push(scopes[n].clone()),
+                OpCode::GetName(ref n)  => {
+                    match scopes.get(n) {
+                        Some(v) => self.stack.push(v.clone()),
+                        None => ()
+                    }
+                },
                 OpCode::Call => {
                     let mut args_len = 0;
                     match self.stack.pop().unwrap() {
