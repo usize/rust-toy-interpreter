@@ -114,7 +114,7 @@ impl Parser {
                 self.lexer.next_token();
                 return Ok(Expr::Function{name: name, args: args, body: body});
             },
-            _ => Ok(Expr::Nil)
+            _ => Err(String::from("unrecognized expression"))
         }
     }
 
@@ -130,6 +130,7 @@ impl Parser {
     // Wrap in a while loop
     fn parse_expression(&mut self) -> Result<Expr, String> {
         let e1 = try!(self.parse_term());
+        self.lexer.next_token();
         if self.lexer.tokens_remaining() > 0 &&
            self.lexer.current_is_type(TokenType::BinOp) {
             return self.parse_binop(e1);
