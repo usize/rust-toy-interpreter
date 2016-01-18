@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::io::{self, Write};
 
 use compiler::*;
@@ -28,10 +29,10 @@ fn main() {
 
     let mut vm = VM::new();
     let mut parser = Parser::new();
+    let mut scopes = HashMap::new();
 
     loop {
         let mut buffer = String::new();
-
         weak_try!(io::stdout().write(b"Harvey> "));
         weak_try!(io::stdout().flush());
 
@@ -42,7 +43,7 @@ fn main() {
                     println!("Parser: {:?}", &statements);
                     let script = compile_script(statements);
                     vm.load(script);
-                    vm.run();
+                    vm.run(&mut scopes);
                     println!("VM: stack: {:?}, program: {:?}", vm.stack(), vm.program());
                 }
             }

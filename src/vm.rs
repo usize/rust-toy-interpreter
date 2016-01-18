@@ -10,8 +10,6 @@ pub struct VM {
     stack:      Vec<Value>,
     ip:         usize,
     running:    bool,
-    // TODO: Make real scopes instead of this travesty
-    scopes:     HashMap<String, Value>
 }
 
 impl VM {
@@ -21,7 +19,6 @@ impl VM {
             stack: Vec::new(),
             ip: 0,
             running: false,
-            scopes: HashMap::new()
         };
     }
 
@@ -39,7 +36,7 @@ impl VM {
         return &self.program;
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self, scopes: &mut HashMap<String, Value>) {
         self.running = true;
         while self.running && self.ip < self.program.len() {
             match self.program[self.ip] {
@@ -67,12 +64,12 @@ impl VM {
                 OpCode::Def         => {
                     match self.stack.pop().unwrap() {
                         Value::Str(s) => {
-                            self.scopes.insert(s, self.stack.pop().unwrap());
+                            scopes.insert(s, self.stack.pop().unwrap());
                         },
                         _ => self.stack.push(Value::Error("invalid assignment")),
                     }
                 },
-                OpCode::GetName(ref n)  => self.stack.push(self.scopes[n].clone()),
+                OpCode::GetName(ref n)  => self.stack.push(scopes[n].clone()),
                 OpCode::Call => {
                     let mut args_len = 0;
                     match self.stack.pop().unwrap() {
@@ -90,14 +87,14 @@ impl VM {
                                     let mut frame = VM::new();
                                     for arg in args {
                                         if args_len > 0 {
-                                            frame.scopes.insert(arg.clone(), arg_values.pop().unwrap());
+                                            scopes.insert(arg.clone(), arg_values.pop().unwrap());
                                             args_len -= 1;
                                         } else {
-                                            frame.scopes.insert(arg.clone(), Value::Undefined);
+                                            scopes.insert(arg.clone(), Value::Undefined);
                                         }
                                     }
                                     frame.load(body);
-                                    frame.run();
+                                    frame.run(scopes);
                                     self.stack.push(frame.stack()[0].clone());
                                 }
                             }
