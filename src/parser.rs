@@ -182,7 +182,7 @@ impl Parser {
     }
 
     pub fn parse_program(&mut self) -> Result<Vec<Statement>, String> {
-        println!("Lexer: {:?}", self.lexer.tokens());
+        println!("Lexer: \n\t{:?}", self.lexer.tokens());
         let mut program = Vec::new();
         if self.lexer.tokens().len() > 0 {
             loop {

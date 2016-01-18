@@ -40,11 +40,15 @@ fn main() {
             match parser.parse_lines(buffer.clone()) {
                 Err(msg) => println!("{}", msg),
                 Ok(statements) => {
-                    println!("Parser: {:?}", &statements);
+                    println!("Parser: \n\t{:?}", &statements);
                     let script = compile_script(statements);
                     vm.load(script);
-                    vm.run(&mut scopes);
-                    println!("VM: stack: {:?}, program: {:?}", vm.stack(), vm.program());
+                    let result = vm.run(&mut scopes).unwrap();
+                    println!("VM: \n\tstack: {:?}, \n\tprogram: {:?}\n", vm.stack(), vm.program());
+                    match result {
+                        Some(value) => println!("Harvey> {:?}", value),
+                        None => ()
+                    }
                 }
             }
         }

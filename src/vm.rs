@@ -36,7 +36,7 @@ impl VM {
         return &self.program;
     }
 
-    pub fn run(&mut self, scopes: &mut HashMap<String, Value>) {
+    pub fn run(&mut self, scopes: &mut HashMap<String, Value>) -> Result<Option<Value>, ()> {
         self.running = true;
         while self.running && self.ip < self.program.len() {
             match self.program[self.ip] {
@@ -94,8 +94,10 @@ impl VM {
                                         }
                                     }
                                     frame.load(body);
-                                    frame.run(scopes);
-                                    self.stack.push(frame.stack()[0].clone());
+                                    match try!(frame.run(scopes)) {
+                                        Some(result) => self.stack.push(result),
+                                        None => ()
+                                    }
                                 }
                             }
                         },
@@ -106,5 +108,9 @@ impl VM {
             self.ip += 1;
         }
         self.running = false;
+        match self.stack.get(0) {
+            Some(result) => return Ok(Some(result.clone())),
+            None => return Ok(None)
+        }
     }
 }
