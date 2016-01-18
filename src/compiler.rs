@@ -5,9 +5,9 @@ use value::Value;
 use object::Object;
 
 fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
-    match expr {
-        &Expr::Atom(ref v) => script.push(OpCode::Val(v.clone())),
-        &Expr::BinaryOperation(ref bop) => {
+    match *expr {
+        Expr::Atom(ref v) => script.push(OpCode::Val(v.clone())),
+        Expr::BinaryOperation(ref bop) => {
             compile_expression(script, &bop.r_expr);
             compile_expression(script, &bop.l_expr);
             match bop.op {
@@ -17,10 +17,10 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
                 BinOp::Div  => script.push(OpCode::Div),
             }
         },
-        &Expr::GetName(ref n) => {
+        Expr::GetName(ref n) => {
             script.push(OpCode::GetName(n.clone()))
         },
-        &Expr::Function{ref name, ref args, ref body} => {
+        Expr::Function{ref name, ref args, ref body} => {
             let s = compile_script(body.clone());
             let o = Object::Function{args: args.clone(), body: s};
             script.push(OpCode::Val(Value::Object(o)));
@@ -32,14 +32,14 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
                 None => ()
             }
         },
-        &Expr::Call(ref args) => {
+        Expr::Call(ref args) => {
             for e in args {
                 compile_expression(script, e);
             }
             script.push(OpCode::Val(Value::Int((args.len() as i32) - 1)));
             script.push(OpCode::Call);
         },
-        &Expr::Nil => ()
+        Expr::Nil => ()
     }
 }
 
