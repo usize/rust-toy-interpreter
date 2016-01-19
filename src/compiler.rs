@@ -38,8 +38,7 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
             }
             script.push(OpCode::Val(Value::Int((args.len() as i32) - 1)));
             script.push(OpCode::Call);
-        },
-        Expr::Nil => ()
+        }
     }
 }
 
