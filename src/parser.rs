@@ -71,7 +71,6 @@ impl Parser {
                             self.lexer.next_token();
                             while !self.lexer.current_is_type(TokenType::RPar) {
                                 expr_stack.push(try!(self.parse_expression()));
-                                self.lexer.next_token();
                                 if self.lexer.current_is_type(TokenType::Comma) {
                                     self.lexer.next_token();
                                 }
