@@ -75,6 +75,9 @@ impl VM {
                         None => ()
                     }
                 },
+                OpCode::Ret => {
+                    self.running = false;
+                },
                 OpCode::Call => {
                     let mut args_len = 0;
                     match self.stack.pop().unwrap() {

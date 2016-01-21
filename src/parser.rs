@@ -17,6 +17,7 @@ pub enum Expr {
     GetName(String),
     Function{name: Option<String>, args: Vec<String>, body: Vec<Statement>},
     Call(Vec<Expr>),
+    Return(Box<Expr>),
     Nil,
 }
 
@@ -112,6 +113,11 @@ impl Parser {
                 let body = try!(self.parse_block());
                 self.lexer.next_token();
                 return Ok(Expr::Function{name: name, args: args, body: body});
+            },
+            TokenType::Return => {
+                self.lexer.next_token();
+                let e = try!(self.parse_expression());
+                return Ok(Expr::Return(Box::new(e)));
             },
             _ => Err(String::from("unrecognized expression"))
         }

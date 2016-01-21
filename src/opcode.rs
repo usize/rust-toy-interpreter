@@ -8,6 +8,7 @@ pub enum OpCode {
     Mul,    // stack.pop() * stack.pop()
     Div,    // stack.pop() / stack.pop()
     Def,    // scopes[stack.pop()] = stack.pop()
+    Ret,
     Call,   // stack.pop()(...)
     GetName(String), // stack.push(scopes[String])
 }
