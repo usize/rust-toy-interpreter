@@ -18,7 +18,6 @@ pub enum Expr {
     Function{name: Option<String>, args: Vec<String>, body: Vec<Statement>},
     Call(Vec<Expr>),
     Return(Box<Expr>),
-    Nil,
 }
 
 #[derive(Debug)]

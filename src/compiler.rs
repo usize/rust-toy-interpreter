@@ -43,7 +43,6 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
            compile_expression(script, e);
            script.push(OpCode::Ret);
         },
-        Expr::Nil => ()
     }
 }
 
