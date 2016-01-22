@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 
 use std::collections::HashMap;
-use std::io::{self, Write};
 
 use compiler::*;
 use parser::*;
@@ -17,6 +16,8 @@ mod object;
 mod lexer;
 mod value;
 mod vm;
+
+extern crate readline;
 
 macro_rules! weak_try {
     ($func:expr) => {
@@ -37,12 +38,10 @@ fn main() {
     let mut scopes = HashMap::new();
 
     loop {
-        let mut buffer = String::new();
-        weak_try!(io::stdout().write(b"Harvey> "));
-        weak_try!(io::stdout().flush());
-
-        for _ in io::stdin().read_line(&mut buffer) {
-            match parser.parse_lines(buffer.clone()) {
+        loop {
+            let input = readline::readline("Harvey> ").unwrap();
+            readline::add_history(&input);
+            match parser.parse_lines(input.clone()) {
                 Err(msg) => println!("{}", msg),
                 Ok(statements) => {
                     println!("Parser: \n\t{:?}", &statements);

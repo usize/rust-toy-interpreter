@@ -2,3 +2,7 @@
 name = "Harvey"
 version = "0.0.0"
 authors = ["Morgan Phillips <winter2718@gmail.com>"]
+
+[dependencies.readline]
+
+git = "https://github.com/shaleh/rust-readline"
