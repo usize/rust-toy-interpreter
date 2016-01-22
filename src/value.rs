@@ -12,7 +12,14 @@ pub enum Value {
 impl PartialEq for Value {
     fn eq(&self, other: &Value) -> bool {
         match (self, other) {
-            (&Value::Number(a), &Value::Number(b)) => a == b,
+            (&Value::Number(a), &Value::Number(b)) =>
+                if a == b {
+                    // The two values are the same... unless they're 0 and -0.
+                    a.is_sign_negative() == b.is_sign_negative()
+                } else {
+                    // THe two values are different... unless they're both NaN.
+                    a.is_nan() == b.is_nan()
+                },
             (&Value::Str(ref a), &Value::Str(ref b)) => a == b,
             (&Value::Undefined, &Value::Undefined) => true,
             _ => false

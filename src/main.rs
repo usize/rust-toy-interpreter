@@ -82,4 +82,5 @@ fn eval(code: &str) -> Value {
 #[test]
 fn it_works() {
     assert_eq!(eval("2 + 2"), Value::Number(4.0));
+    assert_eq!(eval("0 / 0"), Value::Number(std::f64::NAN));
 }
