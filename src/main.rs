@@ -6,6 +6,8 @@ use std::io::{self, Write};
 use compiler::*;
 use parser::*;
 use vm::*;
+
+#[cfg(test)]
 use value::Value;
 
 mod compiler;
@@ -67,6 +69,7 @@ macro_rules! assert_ok {
     )
 }
 
+#[cfg(test)]
 fn eval(code: &str) -> Value {
     let mut parser = Parser::new();
     let ast = assert_ok!(parser.parse_lines(code.to_string()));
