@@ -31,6 +31,7 @@ impl Value {
     pub fn add(&self, b: Value) -> Value {
         match (self, b) {
             (&Value::Number(a), Value::Number(b)) => Value::Number(a + b),
+            (&Value::Str(ref a), Value::Str(ref b)) => Value::Str(a.clone() + b),
             _ => Value::Error("invalid operation")
         }
     }
