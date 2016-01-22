@@ -5,8 +5,7 @@ pub enum Value {
     Number(f64),
     Str(String),
     Object(Object),
-    Undefined,
-    Error(&'static str),
+    Undefined
 }
 
 impl PartialEq for Value {
@@ -28,32 +27,32 @@ impl PartialEq for Value {
 }
 
 impl Value {
-    pub fn add(&self, b: Value) -> Value {
-        match (self, b) {
+    pub fn add(&self, b: Value) -> Result<Value, String> {
+        Ok(match (self, b) {
             (&Value::Number(a), Value::Number(b)) => Value::Number(a + b),
             (&Value::Str(ref a), Value::Str(ref b)) => Value::Str(a.clone() + b),
-            _ => Value::Error("invalid operation")
-        }
+            _ => return Err("invalid operation".to_string())
+        })
     }
 
-    pub fn sub(&self, b: Value) -> Value {
-        match (self, b) {
+    pub fn sub(&self, b: Value) -> Result<Value, String> {
+        Ok(match (self, b) {
             (&Value::Number(a), Value::Number(b)) => Value::Number(a - b),
-            _ => Value::Error("invalid operation")
-        }
+            _ => return Err("invalid operation".to_string())
+        })
     }
 
     pub fn mul(&self, b: Value) -> Value {
         match (self, b) {
             (&Value::Number(a), Value::Number(b)) => Value::Number(a * b),
-            _ => Value::Error("invalid operation")
+            _ => Value::Str("invalid operation".to_string())
         }
     }
 
     pub fn div(&self, b: Value) -> Value {
         match (self, b) {
             (&Value::Number(a), Value::Number(b)) => Value::Number(a / b),
-            _ => Value::Error("invalid operation")
+            _ => Value::Str("invalid operation".to_string())
         }
     }
 }

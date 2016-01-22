@@ -48,11 +48,12 @@ fn main() {
                     println!("Parser: \n\t{:?}", &statements);
                     let script = compile_script(statements);
                     vm.load(script);
-                    let result = vm.run(&mut scopes).unwrap();
+                    let result = vm.run(&mut scopes);
                     println!("VM: \n\tstack: {:?}, \n\tprogram: {:?}\n", vm.stack(), vm.program());
                     match result {
-                        Some(value) => println!("Harvey> {:?}", value),
-                        None => ()
+                        Ok(Some(value)) => println!("Harvey> {:?}", value),
+                        Ok(None) => (),
+                        Err(msg) => println!("Error: {}", msg)
                     }
                 }
             }
