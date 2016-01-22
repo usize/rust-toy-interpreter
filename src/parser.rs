@@ -175,6 +175,7 @@ impl Parser {
                 try!(self.lexer.match_token(TokenType::LPar));
                 self.lexer.next_token();
                 let cond = try!(self.parse_expression());
+                self.lexer.next_token();
                 try!(self.lexer.match_token(TokenType::RPar));
                 self.lexer.next_token();
                 let body = try!(self.parse_block());
@@ -195,6 +196,7 @@ impl Parser {
                 try!(self.lexer.match_token(TokenType::LPar));
                 self.lexer.next_token();
                 let cond = try!(self.parse_expression());
+                self.lexer.next_token();
                 try!(self.lexer.match_token(TokenType::RPar));
                 self.lexer.next_token();
                 let body = try!(self.parse_block());
