@@ -79,7 +79,8 @@ impl VM {
                     match self.stack.pop().unwrap().as_bool() {
                         Value::Bool(v) => {
                             if !v {
-                                self.ip += *n;
+                                self.ip = (self.ip as i32 + *n) as usize;
+                                continue;
                             }
                         },
                         _ => ()
@@ -89,12 +90,17 @@ impl VM {
                     match self.stack.pop().unwrap().as_bool() {
                         Value::Bool(v) => {
                             if v {
-                                self.ip += *n;
+                                self.ip = (self.ip as i32  + *n) as usize;
+                                continue;
                             }
                         },
                         _ => ()
                     }
-                }
+                },
+                OpCode::Jump(ref n) => {
+                    self.ip = (self.ip as i32 + *n) as usize;
+                    continue;
+                },
                 OpCode::Ret => {
                     self.running = false;
                 },

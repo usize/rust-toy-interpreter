@@ -10,7 +10,8 @@ pub enum OpCode {
     Def,    // scopes[stack.pop()] = stack.pop()
     Ret,
     Call,   // stack.pop()(...)
-    JumpIfNot(usize), // if !stack.pop() -> pc += jump
-    JumpIf(usize),    // if stack.pop() -> pc += jump
+    JumpIfNot(i32),   // if !stack.pop() -> pc += jump
+    JumpIf(i32),      // if stack.pop() -> pc += jump
+    Jump(i32),        // pc += jump
     GetName(String),  // stack.push(scopes[String])
 }

@@ -61,18 +61,27 @@ pub fn compile_script(statements: Vec<Statement>) -> Vec<OpCode> {
             Statement::If{cond, body} => {
                 compile_expression(&mut script, &cond);
                 let body = compile_script(body);
-                script.push(OpCode::JumpIfNot(body.len()));
+                script.push(OpCode::JumpIfNot(body.len() as i32 + 1));
                 script.extend(body.iter().cloned());
             },
             Statement::IfElse{cond, body, else_body} => {
                 compile_expression(&mut script, &cond);
                 let body = compile_script(body);
-                script.push(OpCode::JumpIfNot(body.len()));
+                script.push(OpCode::JumpIfNot(body.len() as i32 + 1));
                 script.extend(body.iter().cloned());
                 compile_expression(&mut script, &cond);
                 let else_body = compile_script(else_body);
-                script.push(OpCode::JumpIf(else_body.len()));
+                script.push(OpCode::JumpIf(else_body.len() as i32));
                 script.extend(else_body.iter().cloned());
+            },
+            Statement::While{cond, body} => {
+                let start_len = script.len() as i32;
+                compile_expression(&mut script, &cond);
+                let body = compile_script(body);
+                script.push(OpCode::JumpIfNot(body.len() as i32 + 2));
+                script.extend(body.iter().cloned());
+                let end_len = script.len() as i32;
+                script.push(OpCode::Jump(start_len - end_len));
             },
         }
     }

@@ -34,6 +34,7 @@ pub enum Statement {
     Assignment(DefLet),
     If{cond: Expr, body: Vec<Statement>},
     IfElse{cond: Expr, body: Vec<Statement>, else_body: Vec<Statement>},
+    While{cond: Expr, body: Vec<Statement>}
 }
 
 pub struct Parser {
@@ -85,7 +86,10 @@ impl Parser {
                             }
                             return Ok(Expr::Call(expr_stack));
                         },
-                        _ => return Ok(e1)
+                        _ => {
+                            self.lexer.prev_token();
+                            return Ok(e1)
+                        }
                     }
                 }
                 return Ok(e1);
@@ -181,6 +185,16 @@ impl Parser {
                     });
                 }
                 return Ok(Statement::If{cond: cond, body: body});
+            },
+            TokenType::While => {
+                self.lexer.next_token();
+                try!(self.lexer.match_token(TokenType::LPar));
+                self.lexer.next_token();
+                let cond = try!(self.parse_expression());
+                try!(self.lexer.match_token(TokenType::RPar));
+                self.lexer.next_token();
+                let body = try!(self.parse_block());
+                return Ok(Statement::While{cond: cond, body: body});
             },
             _ => {
                 let e = try!(self.parse_expression());
