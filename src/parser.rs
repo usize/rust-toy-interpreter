@@ -1,16 +1,14 @@
 use lexer::*;
 use value::*;
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct BinaryOp {
     pub l_expr: Expr,
     pub op: BinOp,
     pub r_expr: Expr,
 }
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum Expr {
     Atom(Value),
     BinaryOperation(Box<BinaryOp>),
@@ -20,15 +18,13 @@ pub enum Expr {
     Return(Box<Expr>),
 }
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct DefLet {
     pub name: String,
     pub expr: Expr
 }
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum Statement {
     Expression(Expr),
     Assignment(DefLet),
