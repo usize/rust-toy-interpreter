@@ -58,7 +58,7 @@ fn main() {
                 let result = vm.run(&mut scopes);
                 //println!("VM: \n\tstack: {:?}, \n\tprogram: {:?}\n", vm.stack(), vm.program());
                 match result {
-                    Ok(Some(value)) => println!("Harvey> {:?}", value),
+                    Ok(Some(value)) => println!("{:?}", value),
                     Ok(None) => (),
                     Err(msg) => println!("Error: {}", msg)
                 }
