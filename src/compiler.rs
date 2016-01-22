@@ -36,7 +36,7 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
             for e in args {
                 compile_expression(script, e);
             }
-            script.push(OpCode::Val(Value::Int((args.len() as i32) - 1)));
+            script.push(OpCode::Val(Value::Number((args.len() as f64) - 1.0)));
             script.push(OpCode::Call);
         },
         Expr::Return(ref e) => {

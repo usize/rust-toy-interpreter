@@ -79,11 +79,11 @@ impl VM {
                     self.running = false;
                 },
                 OpCode::Call => {
-                    let mut args_len = 0;
-                    match self.stack.pop().unwrap() {
-                        Value::Int(i) => args_len = i,
-                        _ => ()
-                    }
+                    let mut args_len =
+                        match self.stack.pop().unwrap() {
+                            Value::Number(n) => n as usize,
+                            _ => panic!("bad bytecode")
+                        };
                     let mut arg_values = Vec::new();
                     for _ in 0 .. args_len {
                         arg_values.push(self.stack.pop().unwrap());
