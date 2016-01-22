@@ -5,6 +5,7 @@ pub enum Value {
     Number(f64),
     Str(String),
     Object(Object),
+    Bool(bool),
     Undefined
 }
 
@@ -53,6 +54,16 @@ impl Value {
         match (self, b) {
             (&Value::Number(a), Value::Number(b)) => Value::Number(a / b),
             _ => Value::Str("invalid operation".to_string())
+        }
+    }
+
+    pub fn as_bool(&self) -> Value {
+        match *self {
+            Value::Number(ref v)    => Value::Bool(*v != 0 as f64),
+            Value::Str(ref v)       => Value::Bool(v.len() > 0),
+            Value::Bool(ref v)      => Value::Bool(*v == true),
+            Value::Object(_)    => Value::Bool(true),
+            Value::Undefined    => Value::Bool(false)
         }
     }
 }

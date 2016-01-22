@@ -76,10 +76,9 @@ impl VM {
                     }
                 },
                 OpCode::JumpIfNot(ref n) => {
-                    // TODO: Add an as_bool() method to Value
-                    match self.stack.pop().unwrap() {
-                        Value::Number(v) => {
-                            if v == 0 as f64 {
+                    match self.stack.pop().unwrap().as_bool() {
+                        Value::Bool(v) => {
+                            if !v {
                                 self.ip += *n;
                             }
                         },
@@ -87,9 +86,9 @@ impl VM {
                     }
                 },
                 OpCode::JumpIf(ref n) => {
-                    match self.stack.pop().unwrap() {
-                        Value::Number(v) => {
-                            if v != 0 as f64 {
+                    match self.stack.pop().unwrap().as_bool() {
+                        Value::Bool(v) => {
+                            if v {
                                 self.ip += *n;
                             }
                         },
