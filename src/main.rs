@@ -6,6 +6,7 @@ use std::io::{self, Write};
 use compiler::*;
 use parser::*;
 use vm::*;
+use value::Value;
 
 mod compiler;
 mod parser;
@@ -55,4 +56,30 @@ fn main() {
             }
         }
     }
+}
+
+macro_rules! assert_ok {
+    ($e: expr) => (
+        match $e {
+            Ok(x) => x,
+            Err(err) => panic!("{:?}", err)
+        }
+    )
+}
+
+fn eval(code: &str) -> Value {
+    let mut parser = Parser::new();
+    let ast = assert_ok!(parser.parse_lines(code.to_string()));
+    let script = compile_script(ast);
+
+    let mut vm = VM::new();
+    vm.load(script);
+
+    let mut scopes = HashMap::new();
+    assert_ok!(vm.run(&mut scopes)).expect("script did not produce a value")
+}
+
+#[test]
+fn it_works() {
+    assert_eq!(eval("2 + 2"), Value::Number(4.0));
 }
