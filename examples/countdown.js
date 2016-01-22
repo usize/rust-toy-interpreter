@@ -5,6 +5,6 @@ while (x) {
     } else {
         print("ALMOST THERE!");
     }
-    let x = x - 1;
+    x = x - 1;
 }
 print("MADE IT!");
