@@ -54,12 +54,12 @@ impl VM {
                 OpCode::Mul         => {
                     let a = self.stack.pop().unwrap();
                     let b = self.stack.pop().unwrap();
-                    self.stack.push(a.mul(b));
+                    self.stack.push(try!(a.mul(b)));
                 },
                 OpCode::Div         => {
                     let a = self.stack.pop().unwrap();
                     let b = self.stack.pop().unwrap();
-                    self.stack.push(a.div(b));
+                    self.stack.push(try!(a.div(b)));
                 },
                 OpCode::Def         => {
                     match self.stack.pop().unwrap() {

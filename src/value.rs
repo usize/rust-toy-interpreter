@@ -43,18 +43,18 @@ impl Value {
         })
     }
 
-    pub fn mul(&self, b: Value) -> Value {
-        match (self, b) {
+    pub fn mul(&self, b: Value) -> Result<Value, String> {
+        Ok(match (self, b) {
             (&Value::Number(a), Value::Number(b)) => Value::Number(a * b),
-            _ => Value::Str("invalid operation".to_string())
-        }
+            _ => return Err("invalid operation".to_string())
+        })
     }
 
-    pub fn div(&self, b: Value) -> Value {
-        match (self, b) {
+    pub fn div(&self, b: Value) -> Result<Value, String> {
+        Ok(match (self, b) {
             (&Value::Number(a), Value::Number(b)) => Value::Number(a / b),
-            _ => Value::Str("invalid operation".to_string())
-        }
+            _ => return Err("invalid operation".to_string())
+        })
     }
 
     pub fn as_bool(&self) -> Value {
