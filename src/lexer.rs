@@ -26,7 +26,8 @@ pub enum TokenType {
     Else,
     While,
     True,
-    False
+    False,
+    Semicolon,
 }
 
 #[derive(Debug)]
@@ -327,8 +328,14 @@ impl Lexer {
                         self.add_token(TokenType::Period, line);
                         continue;
                     },
+                    ';'  => {
+                        self.cursor += 1;
+                        self.add_token(TokenType::Semicolon, line);
+                        continue;
+                    },
                     '\n' => break,
                     '\0' => break,
+                    ' '  => break,
                     _    => {
                         return Err(format!("unknown symbol: {}, ln: {} col: {}",
                                             &line[self.start_pos..line.len()],
