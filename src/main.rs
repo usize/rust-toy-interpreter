@@ -1,5 +1,9 @@
 #![allow(non_snake_case)]
 
+use std::env;
+use std::process;
+use std::fs::File;
+use std::io::prelude::*;
 use std::collections::HashMap;
 
 use value::Value;
@@ -31,8 +35,6 @@ macro_rules! weak_try {
 const VERSION: &'static str = "0.0.0";
 
 fn main() {
-    println!("Harvey {} (github.com/mrrrgn/harvey)", VERSION);
-
     let mut vm = VM::new();
     let mut parser = Parser::new();
     let mut scopes = HashMap::new();
@@ -46,17 +48,43 @@ fn main() {
     scopes.insert("print".to_string(),
                   Value::Object(Object::Native(Native::Function(pr_native))));
 
+
+    let args: Vec<String> = env::args().collect();
+    // let's run a script !
+    if args.len() > 1 {
+        let filename = &args[1];
+        let mut f =  match File::open(filename) {
+            Ok(f) => f,
+            Err(_) => panic!("Failed to open {}", filename)
+        };
+        let mut buf = String::new();
+        f.read_to_string(&mut buf).unwrap();
+        match parser.parse_lines(buf) {
+            Err(msg) => println!("{}", msg),
+            Ok(statements) => {
+                let script = compile_script(statements);
+                vm.load(script);
+                let result = vm.run(&mut scopes);
+                match result {
+                    Ok(_) => (),
+                    Err(msg) => panic!("Error: {}", msg)
+                }
+            }
+        }
+        process::exit(0);
+    }
+
+    println!("Harvey {} (github.com/mrrrgn/harvey)", VERSION);
+
     loop {
         let input = readline::readline("Harvey> ").unwrap();
         readline::add_history(&input);
         match parser.parse_lines(input.clone()) {
             Err(msg) => println!("{}", msg),
             Ok(statements) => {
-                //println!("Parser: \n\t{:?}", &statements);
                 let script = compile_script(statements);
                 vm.load(script);
                 let result = vm.run(&mut scopes);
-                //println!("VM: \n\tstack: {:?}, \n\tprogram: {:?}\n", vm.stack(), vm.program());
                 match result {
                     Ok(Some(value)) => println!("{:?}", value),
                     Ok(None) => (),

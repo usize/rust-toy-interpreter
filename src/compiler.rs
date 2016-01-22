@@ -71,7 +71,7 @@ pub fn compile_script(statements: Vec<Statement>) -> Vec<OpCode> {
                 script.extend(body.iter().cloned());
                 compile_expression(&mut script, &cond);
                 let else_body = compile_script(else_body);
-                script.push(OpCode::JumpIf(else_body.len() as i32));
+                script.push(OpCode::JumpIf(else_body.len() as i32 + 1));
                 script.extend(else_body.iter().cloned());
             },
             Statement::While{cond, body} => {
