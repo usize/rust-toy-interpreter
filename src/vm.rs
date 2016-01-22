@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
-use object::Object;
+use object::{Object, Native};
 use opcode::OpCode;
 use value::Value;
 
@@ -132,6 +132,11 @@ impl VM {
                                         Some(result) => self.stack.push(result),
                                         None => ()
                                     }
+                                },
+                                Object::Native(nobj) => {
+                                   match nobj {
+                                      Native::Function(f) => self.stack.push(f(arg_values))
+                                   }
                                 }
                             }
                         },

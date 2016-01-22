@@ -2,12 +2,12 @@
 
 use std::collections::HashMap;
 
+use value::Value;
+use object::{Object, Native};
 use compiler::*;
 use parser::*;
 use vm::*;
 
-#[cfg(test)]
-use value::Value;
 
 mod compiler;
 mod parser;
@@ -37,23 +37,29 @@ fn main() {
     let mut parser = Parser::new();
     let mut scopes = HashMap::new();
 
+    fn pr_native(args: Vec<Value>) -> Value {
+        Value::Str(format!("{:?}", args).to_string())
+    }
+
+    // insert a handy native print method
+    scopes.insert("print".to_string(),
+                  Value::Object(Object::Native(Native::Function(pr_native))));
+
     loop {
-        loop {
-            let input = readline::readline("Harvey> ").unwrap();
-            readline::add_history(&input);
-            match parser.parse_lines(input.clone()) {
-                Err(msg) => println!("{}", msg),
-                Ok(statements) => {
-                    println!("Parser: \n\t{:?}", &statements);
-                    let script = compile_script(statements);
-                    vm.load(script);
-                    let result = vm.run(&mut scopes);
-                    println!("VM: \n\tstack: {:?}, \n\tprogram: {:?}\n", vm.stack(), vm.program());
-                    match result {
-                        Ok(Some(value)) => println!("Harvey> {:?}", value),
-                        Ok(None) => (),
-                        Err(msg) => println!("Error: {}", msg)
-                    }
+        let input = readline::readline("Harvey> ").unwrap();
+        readline::add_history(&input);
+        match parser.parse_lines(input.clone()) {
+            Err(msg) => println!("{}", msg),
+            Ok(statements) => {
+                println!("Parser: \n\t{:?}", &statements);
+                let script = compile_script(statements);
+                vm.load(script);
+                let result = vm.run(&mut scopes);
+                println!("VM: \n\tstack: {:?}, \n\tprogram: {:?}\n", vm.stack(), vm.program());
+                match result {
+                    Ok(Some(value)) => println!("Harvey> {:?}", value),
+                    Ok(None) => (),
+                    Err(msg) => println!("Error: {}", msg)
                 }
             }
         }
