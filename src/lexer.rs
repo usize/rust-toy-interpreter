@@ -153,8 +153,8 @@ impl Lexer {
             "if"        => Some(TokenType::If),
             "else"      => Some(TokenType::Else),
             "while"     => Some(TokenType::While),
-            "true"      => Some(TokenType::While),
-            "false"     => Some(TokenType::While),
+            "true"      => Some(TokenType::True),
+            "false"     => Some(TokenType::False),
             "function"  => Some(TokenType::Function),
             "return"    => Some(TokenType::Return),
              _ => None

@@ -62,6 +62,12 @@ impl Parser {
             TokenType::Str => {
                 return Ok(Expr::Atom(Value::Str(self.lexer.curr_value())));
             },
+            TokenType::True => {
+                return Ok(Expr::Atom(Value::Bool(true)));
+            },
+            TokenType::False => {
+                return Ok(Expr::Atom(Value::Bool(false)));
+            },
             TokenType::Identifier => {
                 let e1 = Expr::GetName(self.lexer.curr_value());
                 if self.lexer.next_token() {
