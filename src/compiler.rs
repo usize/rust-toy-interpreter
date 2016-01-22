@@ -58,6 +58,22 @@ pub fn compile_script(statements: Vec<Statement>) -> Vec<OpCode> {
         match statement {
             Statement::Expression(s) => compile_expression(&mut script, &s),
             Statement::Assignment(a) => compile_assignment(&mut script, &a),
+            Statement::If{cond, body} => {
+                compile_expression(&mut script, &cond);
+                let body = compile_script(body);
+                script.push(OpCode::JumpIfNot(body.len()));
+                script.extend(body.iter().cloned());
+            },
+            Statement::IfElse{cond, body, else_body} => {
+                compile_expression(&mut script, &cond);
+                let body = compile_script(body);
+                script.push(OpCode::JumpIfNot(body.len()));
+                script.extend(body.iter().cloned());
+                compile_expression(&mut script, &cond);
+                let else_body = compile_script(else_body);
+                script.push(OpCode::JumpIf(else_body.len()));
+                script.extend(else_body.iter().cloned());
+            },
         }
     }
     return script;

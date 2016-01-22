@@ -21,7 +21,12 @@ pub enum TokenType {
     Colon,
     Comma,
     Period,
-    BinOp
+    BinOp,
+    If,
+    Else,
+    While,
+    True,
+    False
 }
 
 #[derive(Debug)]
@@ -144,9 +149,14 @@ impl Lexer {
 
     fn keyword(&mut self, line: &str) -> Option<TokenType> {
         match &line[self.start_pos..self.cursor] {
-            "let"      => Some(TokenType::Let),
-            "function" => Some(TokenType::Function),
-            "return"   => Some(TokenType::Return),
+            "let"       => Some(TokenType::Let),
+            "if"        => Some(TokenType::If),
+            "else"      => Some(TokenType::Else),
+            "while"     => Some(TokenType::While),
+            "true"      => Some(TokenType::While),
+            "false"     => Some(TokenType::While),
+            "function"  => Some(TokenType::Function),
+            "return"    => Some(TokenType::Return),
              _ => None
         }
     }

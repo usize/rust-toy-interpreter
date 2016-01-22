@@ -32,6 +32,8 @@ pub struct DefLet {
 pub enum Statement {
     Expression(Expr),
     Assignment(DefLet),
+    If{cond: Expr, body: Vec<Statement>},
+    IfElse{cond: Expr, body: Vec<Statement>, else_body: Vec<Statement>},
 }
 
 pub struct Parser {
@@ -145,14 +147,34 @@ impl Parser {
     fn parse_statement(&mut self) -> Result<Statement, String> {
         match *self.lexer.curr_type() {
             TokenType::Let => {
-               self.lexer.next_token();
-               try!(self.lexer.match_token(TokenType::Identifier));
-               let name = self.lexer.curr_value();
-               self.lexer.next_token();
-               self.lexer.match_token(TokenType::Equals).unwrap();
-               self.lexer.next_token();
-               let e = self.parse_expression().unwrap();
-               return Ok(Statement::Assignment(DefLet{name: name, expr: e}));
+                self.lexer.next_token();
+                try!(self.lexer.match_token(TokenType::Identifier));
+                let name = self.lexer.curr_value();
+                self.lexer.next_token();
+                self.lexer.match_token(TokenType::Equals).unwrap();
+                self.lexer.next_token();
+                let e = self.parse_expression().unwrap();
+                return Ok(Statement::Assignment(DefLet{name: name, expr: e}));
+            },
+            TokenType::If => {
+                self.lexer.next_token();
+                try!(self.lexer.match_token(TokenType::LPar));
+                self.lexer.next_token();
+                let cond = try!(self.parse_expression());
+                try!(self.lexer.match_token(TokenType::RPar));
+                self.lexer.next_token();
+                let body = try!(self.parse_block());
+                self.lexer.next_token();
+                if self.lexer.current_is_type(TokenType::Else) {
+                    self.lexer.next_token();
+                    let else_body = try!(self.parse_block());
+                    return Ok(Statement::IfElse{
+                        cond: cond,
+                        body: body,
+                        else_body: else_body
+                    });
+                }
+                return Ok(Statement::If{cond: cond, body: body});
             },
             _ => {
                 let e = try!(self.parse_expression());

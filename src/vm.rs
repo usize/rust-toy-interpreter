@@ -75,6 +75,27 @@ impl VM {
                         None => ()
                     }
                 },
+                OpCode::JumpIfNot(ref n) => {
+                    // TODO: Add an as_bool() method to Value
+                    match self.stack.pop().unwrap() {
+                        Value::Int(v) => {
+                            if v == 0 {
+                                self.ip += *n;
+                            }
+                        },
+                        _ => ()
+                    }
+                },
+                OpCode::JumpIf(ref n) => {
+                    match self.stack.pop().unwrap() {
+                        Value::Int(v) => {
+                            if v != 0 {
+                                self.ip += *n;
+                            }
+                        },
+                        _ => ()
+                    }
+                }
                 OpCode::Ret => {
                     self.running = false;
                 },
