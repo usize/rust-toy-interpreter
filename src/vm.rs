@@ -36,7 +36,7 @@ impl VM {
         return &self.program;
     }
 
-    pub fn run(&mut self, scopes: &mut HashMap<String, Value>) -> Result<Option<Value>, ()> {
+    pub fn run(&mut self, scopes: &mut HashMap<String, Value>) -> Result<Option<Value>, String> {
         self.running = true;
         while self.running && self.ip < self.program.len() {
             match self.program[self.ip] {
@@ -44,12 +44,12 @@ impl VM {
                 OpCode::Add         => {
                     let a = self.stack.pop().unwrap();
                     let b = self.stack.pop().unwrap();
-                    self.stack.push(a.add(b));
+                    self.stack.push(try!(a.add(b)));
                 },
                 OpCode::Sub         => {
                     let a = self.stack.pop().unwrap();
                     let b = self.stack.pop().unwrap();
-                    self.stack.push(a.sub(b));
+                    self.stack.push(try!(a.sub(b)));
                 },
                 OpCode::Mul         => {
                     let a = self.stack.pop().unwrap();
@@ -66,7 +66,7 @@ impl VM {
                         Value::Str(s) => {
                             scopes.insert(s, self.stack.pop().unwrap());
                         },
-                        _ => self.stack.push(Value::Error("invalid assignment")),
+                        _ => return Err("invalid assignment".to_string()),
                     }
                 },
                 OpCode::GetName(ref n)  => {
@@ -100,11 +100,11 @@ impl VM {
                     self.running = false;
                 },
                 OpCode::Call => {
-                    let mut args_len = 0;
-                    match self.stack.pop().unwrap() {
-                        Value::Int(i) => args_len = i,
-                        _ => ()
-                    }
+                    let mut args_len =
+                        match self.stack.pop().unwrap() {
+                            Value::Number(n) => n as usize,
+                            _ => panic!("bad bytecode")
+                        };
                     let mut arg_values = Vec::new();
                     for _ in 0 .. args_len {
                         arg_values.push(self.stack.pop().unwrap());
@@ -130,7 +130,7 @@ impl VM {
                                 }
                             }
                         },
-                        _ => self.stack.push(Value::Error("invalid call")),
+                        _ => return Err("invalid call".to_string()),
                     }
                 },
             }

@@ -53,11 +53,11 @@ impl Parser {
         match *self.lexer.curr_type() {
             TokenType::Int => {
                 let int = self.lexer.curr_value().parse::<i32>().unwrap();
-                return Ok(Expr::Atom(Value::Int(int)));
+                return Ok(Expr::Atom(Value::Number(int as f64)));
             },
             TokenType::Float => {
-                let float = self.lexer.curr_value().parse::<f32>().unwrap();
-                return Ok(Expr::Atom(Value::Float(float)));
+                let float = self.lexer.curr_value().parse::<f64>().unwrap();
+                return Ok(Expr::Atom(Value::Number(float)));
             },
             TokenType::Str => {
                 return Ok(Expr::Atom(Value::Str(self.lexer.curr_value())));

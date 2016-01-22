@@ -7,6 +7,9 @@ use compiler::*;
 use parser::*;
 use vm::*;
 
+#[cfg(test)]
+use value::Value;
+
 mod compiler;
 mod parser;
 mod opcode;
@@ -45,14 +48,44 @@ fn main() {
                     println!("Parser: \n\t{:?}", &statements);
                     let script = compile_script(statements);
                     vm.load(script);
-                    let result = vm.run(&mut scopes).unwrap();
+                    let result = vm.run(&mut scopes);
                     println!("VM: \n\tstack: {:?}, \n\tprogram: {:?}\n", vm.stack(), vm.program());
                     match result {
-                        Some(value) => println!("Harvey> {:?}", value),
-                        None => ()
+                        Ok(Some(value)) => println!("Harvey> {:?}", value),
+                        Ok(None) => (),
+                        Err(msg) => println!("Error: {}", msg)
                     }
                 }
             }
         }
     }
+}
+
+macro_rules! assert_ok {
+    ($e: expr) => (
+        match $e {
+            Ok(x) => x,
+            Err(err) => panic!("{:?}", err)
+        }
+    )
+}
+
+#[cfg(test)]
+fn eval(code: &str) -> Value {
+    let mut parser = Parser::new();
+    let ast = assert_ok!(parser.parse_lines(code.to_string()));
+    let script = compile_script(ast);
+
+    let mut vm = VM::new();
+    vm.load(script);
+
+    let mut scopes = HashMap::new();
+    assert_ok!(vm.run(&mut scopes)).expect("script did not produce a value")
+}
+
+#[test]
+fn it_works() {
+    assert_eq!(eval("2 + 2"), Value::Number(4.0));
+    assert_eq!(eval("0 / 0"), Value::Number(std::f64::NAN));
+    assert_eq!(eval(r#""hello" + "world""#), Value::Str("helloworld".to_string()));
 }
