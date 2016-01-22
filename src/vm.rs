@@ -135,7 +135,13 @@ impl VM {
                                 },
                                 Object::Native(nobj) => {
                                    match nobj {
-                                      Native::Function(f) => self.stack.push(f(arg_values))
+                                      Native::Function(f) => {
+                                          // we won't be popping off the vector
+                                          // so let's flip it as a convenience
+                                          // (values will be in the true arg order)
+                                          arg_values.reverse();
+                                          self.stack.push(f(arg_values));
+                                      }
                                    }
                                 }
                             }
