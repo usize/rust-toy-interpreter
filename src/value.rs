@@ -1,3 +1,4 @@
+use std::fmt;
 use object::Object;
 
 #[derive(Debug, Clone)]
@@ -23,6 +24,18 @@ impl PartialEq for Value {
             (&Value::Str(ref a), &Value::Str(ref b)) => a == b,
             (&Value::Undefined, &Value::Undefined) => true,
             _ => false
+        }
+    }
+}
+
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Value::Number(ref v) => write!(f, "{}", v),
+            Value::Bool(ref b) => write!(f, "{}", b),
+            Value::Str(ref s) => write!(f, "{}", s),
+            Value::Object(_)   => write!(f, "[Object]"),
+            Value::Undefined => write!(f, "undefined"),
         }
     }
 }

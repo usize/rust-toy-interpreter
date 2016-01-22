@@ -40,7 +40,8 @@ fn main() {
     let mut scopes = HashMap::new();
 
     fn pr_native(args: Vec<Value>) -> Value {
-        println!("{:?}", args);
+        let s : Vec<String> = args.iter().map(|ref v| format!("{}", v)).collect();
+        println!("{}", s.connect(" "));
         return Value::Undefined;
     }
 
@@ -86,7 +87,7 @@ fn main() {
                 vm.load(script);
                 let result = vm.run(&mut scopes);
                 match result {
-                    Ok(Some(value)) => println!("{:?}", value),
+                    Ok(Some(value)) => println!("{}", value),
                     Ok(None) => (),
                     Err(msg) => println!("Error: {}", msg)
                 }
