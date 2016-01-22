@@ -161,9 +161,22 @@ impl Parser {
                 try!(self.lexer.match_token(TokenType::Identifier));
                 let name = self.lexer.curr_value();
                 self.lexer.next_token();
-                self.lexer.match_token(TokenType::Equals).unwrap();
+                try!(self.lexer.match_token(TokenType::Equals));
                 self.lexer.next_token();
-                let e = self.parse_expression().unwrap();
+                let e = try!(self.parse_expression());
+                return Ok(Statement::Assignment(DefLet{name: name, expr: e}));
+            },
+            TokenType::Identifier => {
+                let name = self.lexer.curr_value();
+                self.lexer.next_token();
+                if !self.lexer.current_is_type(TokenType::Equals) {
+                    // Whoops, this isn't an assignment
+                    self.lexer.prev_token();
+                    let e = try!(self.parse_expression());
+                    return Ok(Statement::Expression(e));
+                }
+                self.lexer.next_token();
+                let e = try!(self.parse_expression());
                 return Ok(Statement::Assignment(DefLet{name: name, expr: e}));
             },
             TokenType::If => {
