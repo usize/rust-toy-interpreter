@@ -17,7 +17,7 @@ impl PartialEq for Value {
                     // The two values are the same... unless they're 0 and -0.
                     a.is_sign_negative() == b.is_sign_negative()
                 } else {
-                    // THe two values are different... unless they're both NaN.
+                    // The two values are different... unless they're both NaN.
                     a.is_nan() == b.is_nan()
                 },
             (&Value::Str(ref a), &Value::Str(ref b)) => a == b,
