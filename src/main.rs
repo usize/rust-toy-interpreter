@@ -38,7 +38,8 @@ fn main() {
     let mut scopes = HashMap::new();
 
     fn pr_native(args: Vec<Value>) -> Value {
-        Value::Str(format!("{:?}", args).to_string())
+        println!("{:?}", args);
+        return Value::Undefined;
     }
 
     // insert a handy native print method
@@ -51,11 +52,11 @@ fn main() {
         match parser.parse_lines(input.clone()) {
             Err(msg) => println!("{}", msg),
             Ok(statements) => {
-                println!("Parser: \n\t{:?}", &statements);
+                //println!("Parser: \n\t{:?}", &statements);
                 let script = compile_script(statements);
                 vm.load(script);
                 let result = vm.run(&mut scopes);
-                println!("VM: \n\tstack: {:?}, \n\tprogram: {:?}\n", vm.stack(), vm.program());
+                //println!("VM: \n\tstack: {:?}, \n\tprogram: {:?}\n", vm.stack(), vm.program());
                 match result {
                     Ok(Some(value)) => println!("Harvey> {:?}", value),
                     Ok(None) => (),
