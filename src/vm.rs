@@ -153,7 +153,7 @@ impl VM {
             self.ip += 1;
         }
         self.running = false;
-        match self.stack.get(0) {
+        match self.stack.get(self.stack.len() - 1) {
             Some(result) => return Ok(Some(result.clone())),
             None => return Ok(None)
         }
