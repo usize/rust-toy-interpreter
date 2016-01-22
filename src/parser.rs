@@ -243,6 +243,9 @@ impl Parser {
                 }
                 program.push(try!(self.parse_statement()));
                 self.lexer.next_token();
+                if self.lexer.current_is_type(TokenType::Semicolon) {
+                    self.lexer.next_token();
+                }
             }
         }
         return Ok(program);
