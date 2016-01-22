@@ -80,6 +80,7 @@ impl Parser {
                             self.lexer.next_token();
                             while !self.lexer.current_is_type(TokenType::RPar) {
                                 expr_stack.push(try!(self.parse_expression()));
+                                self.lexer.next_token();
                                 if self.lexer.current_is_type(TokenType::Comma) {
                                     self.lexer.next_token();
                                 }
@@ -150,6 +151,9 @@ impl Parser {
         if self.lexer.tokens_remaining() > 0 &&
            self.lexer.current_is_type(TokenType::BinOp) {
             return self.parse_binop(e1);
+        }
+        if self.lexer.tokens_remaining() > 0 {
+            self.lexer.prev_token();
         }
         return Ok(e1);
     }
@@ -232,10 +236,10 @@ impl Parser {
         let mut program = Vec::new();
         if self.lexer.tokens().len() > 0 {
             loop {
-                program.push(try!(self.parse_statement()));
                 if self.lexer.tokens_remaining() < 1 {
-                   return Ok(program);
+                    break;
                 }
+                program.push(try!(self.parse_statement()));
                 self.lexer.next_token();
             }
         }

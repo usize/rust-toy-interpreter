@@ -163,7 +163,7 @@ impl Lexer {
 
     // returns true if there is still a "next" token
     pub fn next_token(&mut self) -> bool {
-        if self.top + 1 < self.tokens.len() {
+        if self.top < self.tokens.len() {
             self.top += 1;
             return true;
         }
@@ -180,10 +180,13 @@ impl Lexer {
     }
 
     pub fn tokens_remaining(&self) -> usize {
-        return (self.tokens.len() - 1) - self.top;
+        return self.tokens.len() - self.top;
     }
 
     pub fn curr_token(&self) -> &Token {
+        if self.top > self.tokens.len() - 1 {
+            return &self.tokens[self.tokens.len() - 1];
+        }
         return &self.tokens[self.top];
     }
 
