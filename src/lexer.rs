@@ -1,8 +1,6 @@
 #![allow(dead_code)]
 
-#[derive(Debug)]
-#[derive(PartialEq)]
-#[derive(Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TokenType {
     Int,
     Float,
@@ -30,17 +28,17 @@ pub enum TokenType {
     Semicolon,
 }
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum BinOp {
     Mul,
     Div,
     Plus,
     Min,
+    EqEq,
+    NotEq,
 }
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Token {
     token_type : TokenType,
     value      : String,
@@ -133,19 +131,32 @@ impl Lexer {
     // Matches a string to a binop, along with its precedence
     pub fn bin_op(v: &str) -> Option<(BinOp, u8)> {
         match v {
-            "+" => Some((BinOp::Plus, 2)),
-            "-" => Some((BinOp::Min, 2)),
-            "*" => Some((BinOp::Mul, 1)),
-            "/" => Some((BinOp::Div, 1)),
+            "+"  => Some((BinOp::Plus, 2)),
+            "-"  => Some((BinOp::Min, 2)),
+            "*"  => Some((BinOp::Mul, 1)),
+            "/"  => Some((BinOp::Div, 1)),
+            "==" => Some((BinOp::EqEq, 9)),
+            "!=" => Some((BinOp::NotEq, 9)),
             _ => None
         }
     }
 
     fn is_binop(&mut self, line: &str) -> bool {
-        match Lexer::bin_op(&line[self.start_pos..self.cursor + 1]) {
-            Some(_) => true,
-            None => false
+        let mut is_binop  = false;
+        // offset corresponds to the widest binop character length
+        let mut offset = 2;
+        while self.cursor + offset >= line.len() {
+            offset -= 1;
         }
+        while offset > 0 && !is_binop {
+            match Lexer::bin_op(&line[self.start_pos..self.cursor + offset]) {
+                Some(_) => is_binop = true,
+                None    => ()
+            }
+            offset -= 1;
+        }
+        self.cursor += offset;
+        return is_binop;
     }
 
     fn keyword(&mut self, line: &str) -> Option<TokenType> {
@@ -269,7 +280,7 @@ impl Lexer {
                     continue;
                 }
 
-                // BinOpS || UNARYOPS
+                // BinOps || UnaryOps
                 if self.is_binop(line) {
                     self.cursor += 1;
                     self.add_token(TokenType::BinOp, line);

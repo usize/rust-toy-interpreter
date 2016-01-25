@@ -11,10 +11,12 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
             compile_expression(script, &bop.r_expr);
             compile_expression(script, &bop.l_expr);
             match bop.op {
-                BinOp::Plus => script.push(OpCode::Add),
-                BinOp::Min  => script.push(OpCode::Sub),
-                BinOp::Mul  => script.push(OpCode::Mul),
-                BinOp::Div  => script.push(OpCode::Div),
+                BinOp::Plus     => script.push(OpCode::Add),
+                BinOp::Min      => script.push(OpCode::Sub),
+                BinOp::Mul      => script.push(OpCode::Mul),
+                BinOp::Div      => script.push(OpCode::Div),
+                BinOp::EqEq     => script.push(OpCode::EqEq),
+                BinOp::NotEq    => script.push(OpCode::NotEq),
             }
         },
         Expr::GetName(ref n) => {

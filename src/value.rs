@@ -19,8 +19,9 @@ impl PartialEq for Value {
                     a.is_sign_negative() == b.is_sign_negative()
                 } else {
                     // The two values are different... unless they're both NaN.
-                    a.is_nan() == b.is_nan()
+                    a.is_nan() && b.is_nan()
                 },
+            (&Value::Bool(ref a), &Value::Bool(ref b)) => a == b,
             (&Value::Str(ref a), &Value::Str(ref b)) => a == b,
             (&Value::Undefined, &Value::Undefined) => true,
             _ => false

@@ -94,6 +94,7 @@ impl Parser {
             TokenType::LPar => {
                 self.lexer.next_token();
                 let e = self.parse_expression();
+                self.lexer.next_token();
                 try!(self.lexer.match_token(TokenType::RPar));
                 return e;
             },

@@ -61,6 +61,16 @@ impl VM {
                     let b = self.stack.pop().unwrap();
                     self.stack.push(try!(a.div(b)));
                 },
+                OpCode::EqEq       => {
+                    let a = self.stack.pop().unwrap();
+                    let b = self.stack.pop().unwrap();
+                    self.stack.push(Value::Bool(a == b));
+                },
+                OpCode::NotEq     => {
+                    let a = self.stack.pop().unwrap();
+                    let b = self.stack.pop().unwrap();
+                    self.stack.push(Value::Bool(a != b));
+                },
                 OpCode::Def         => {
                     match self.stack.pop().unwrap() {
                         Value::Str(s) => {

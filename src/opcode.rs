@@ -7,6 +7,8 @@ pub enum OpCode {
     Sub,    // stack.pop() - stack.pop()
     Mul,    // stack.pop() * stack.pop()
     Div,    // stack.pop() / stack.pop()
+    EqEq,   // stack.pop() == stack.pop()
+    NotEq,  // stack.pop() != stack.pop()
     Def,    // scopes[stack.pop()] = stack.pop()
     Ret,
     Call,   // stack.pop()(...)
