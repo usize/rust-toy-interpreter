@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 use std::env;
 use std::process;
 use std::fs::File;

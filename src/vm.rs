@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::collections::HashMap;
 use object::{Object, Native};
 use opcode::OpCode;
@@ -26,14 +24,6 @@ impl VM {
         self.program = program;
         self.stack = Vec::new();
         self.ip = 0;
-    }
-
-    pub fn stack(&self) -> &Vec<Value> {
-        return &self.stack;
-    }
-
-    pub fn program(&self) -> &Vec<OpCode> {
-        return &self.program;
     }
 
     pub fn run(&mut self, scopes: &mut HashMap<String, Value>) -> Result<Option<Value>, String> {
