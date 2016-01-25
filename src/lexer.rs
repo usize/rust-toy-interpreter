@@ -36,6 +36,10 @@ pub enum BinOp {
     Min,
     EqEq,
     NotEq,
+    Lt,
+    LtEq,
+    Gt,
+    GtEq,
 }
 
 #[derive(Debug, Clone)]
@@ -137,6 +141,10 @@ impl Lexer {
             "/"  => Some((BinOp::Div, 1)),
             "==" => Some((BinOp::EqEq, 9)),
             "!=" => Some((BinOp::NotEq, 9)),
+            "<"  => Some((BinOp::Lt, 9)),
+            "<=" => Some((BinOp::LtEq, 9)),
+            ">"  => Some((BinOp::Gt, 9)),
+            ">=" => Some((BinOp::GtEq, 9)),
             _ => None
         }
     }

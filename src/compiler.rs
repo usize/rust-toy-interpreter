@@ -17,6 +17,10 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
                 BinOp::Div      => script.push(OpCode::Div),
                 BinOp::EqEq     => script.push(OpCode::EqEq),
                 BinOp::NotEq    => script.push(OpCode::NotEq),
+                BinOp::Lt       => script.push(OpCode::Lt),
+                BinOp::LtEq     => script.push(OpCode::LtEq),
+                BinOp::Gt       => script.push(OpCode::Gt),
+                BinOp::GtEq     => script.push(OpCode::GtEq),
             }
         },
         Expr::GetName(ref n) => {

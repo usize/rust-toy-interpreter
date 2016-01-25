@@ -71,6 +71,26 @@ impl VM {
                     let b = self.stack.pop().unwrap();
                     self.stack.push(Value::Bool(a != b));
                 },
+                OpCode::Lt       => {
+                    let a = self.stack.pop().unwrap();
+                    let b = self.stack.pop().unwrap();
+                    self.stack.push(Value::Bool(a < b));
+                },
+                OpCode::LtEq    => {
+                    let a = self.stack.pop().unwrap();
+                    let b = self.stack.pop().unwrap();
+                    self.stack.push(Value::Bool(a <= b));
+                },
+                OpCode::Gt       => {
+                    let a = self.stack.pop().unwrap();
+                    let b = self.stack.pop().unwrap();
+                    self.stack.push(Value::Bool(a > b));
+                },
+                OpCode::GtEq    => {
+                    let a = self.stack.pop().unwrap();
+                    let b = self.stack.pop().unwrap();
+                    self.stack.push(Value::Bool(a >= b));
+                },
                 OpCode::Def         => {
                     match self.stack.pop().unwrap() {
                         Value::Str(s) => {

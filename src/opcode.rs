@@ -9,6 +9,10 @@ pub enum OpCode {
     Div,    // stack.pop() / stack.pop()
     EqEq,   // stack.pop() == stack.pop()
     NotEq,  // stack.pop() != stack.pop()
+    Lt,     // <
+    LtEq,   // <=
+    Gt,     // >
+    GtEq,   // >=
     Def,    // scopes[stack.pop()] = stack.pop()
     Ret,
     Call,   // stack.pop()(...)
