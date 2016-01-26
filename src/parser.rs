@@ -69,20 +69,8 @@ impl Parser {
                 let e1 = Expr::GetName(self.lexer.curr_value());
                 if self.lexer.next_token() {
                     match *self.lexer.curr_type() {
-                        TokenType::BinOp => return Ok(try!(self.parse_binop(e1))),
-                        TokenType::LPar  => {
-                            let mut expr_stack = Vec::new();
-                            expr_stack.push(e1);
-                            self.lexer.next_token();
-                            while !self.lexer.current_is_type(TokenType::RPar) {
-                                expr_stack.push(try!(self.parse_expression()));
-                                self.lexer.next_token();
-                                if self.lexer.current_is_type(TokenType::Comma) {
-                                    self.lexer.next_token();
-                                }
-                            }
-                            return Ok(Expr::Call(expr_stack));
-                        },
+                        TokenType::BinOp => return self.parse_binop(e1),
+                        TokenType::LPar  => return self.parse_call(e1),
                         _ => {
                             self.lexer.prev_token();
                             return Ok(e1)
@@ -93,10 +81,15 @@ impl Parser {
             },
             TokenType::LPar => {
                 self.lexer.next_token();
-                let e = self.parse_expression();
+                let e = try!(self.parse_expression());
                 self.lexer.next_token();
                 try!(self.lexer.match_token(TokenType::RPar));
-                return e;
+                self.lexer.next_token();
+                if self.lexer.current_is_type(TokenType::LPar) {
+                    return self.parse_call(e);
+                }
+                self.lexer.prev_token();
+                return Ok(e);
             },
             TokenType::Function => {
                 self.lexer.next_token();
@@ -138,6 +131,20 @@ impl Parser {
         let r_expr = try!(self.parse_expression());
         let bop = BinaryOp{l_expr: e1, op: op, r_expr: r_expr};
         return Ok(Expr::BinaryOperation(Box::new(bop)));
+    }
+
+    fn parse_call(&mut self, e1: Expr) -> Result<Expr, String> {
+        let mut expr_stack = Vec::new();
+        expr_stack.push(e1);
+        self.lexer.next_token();
+        while !self.lexer.current_is_type(TokenType::RPar) {
+            expr_stack.push(try!(self.parse_expression()));
+            self.lexer.next_token();
+            if self.lexer.current_is_type(TokenType::Comma) {
+                self.lexer.next_token();
+            }
+        }
+        return Ok(Expr::Call(expr_stack));
     }
 
     // Wrap in a while loop

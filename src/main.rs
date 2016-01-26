@@ -125,4 +125,5 @@ fn it_works() {
     assert_eq!(eval("let x = 101; x;"), Value::Number(101.0));
     assert_eq!(eval("let x = 0; while (100 - x) { x = x + 1; }; x;"),
                Value::Number(100.0));
+    assert_eq!(eval("(function (x){return x*2;})(25)"), Value::Number(50.0));
 }
