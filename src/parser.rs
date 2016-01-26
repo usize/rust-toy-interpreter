@@ -120,7 +120,6 @@ impl Parser {
                 try!(self.lexer.match_token(TokenType::RPar));
                 self.lexer.next_token();
                 let body = try!(self.parse_block());
-                self.lexer.next_token();
                 return Ok(Expr::Function{name: name, args: args, body: body});
             },
             TokenType::Return => {
