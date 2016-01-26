@@ -21,15 +21,6 @@ mod vm;
 
 extern crate readline;
 
-macro_rules! weak_try {
-    ($func:expr) => {
-        match $func {
-            Ok(_) => (),
-            Err(err) => println!("{:?}", err)
-        };
-    }
-}
-
 const VERSION: &'static str = "0.0.0";
 
 fn main() {
