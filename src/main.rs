@@ -30,7 +30,7 @@ fn main() {
 
     fn pr_native(args: Vec<Value>) -> Value {
         let s : Vec<String> = args.iter().map(|ref v| format!("{}", v)).collect();
-        println!("{}", s.connect(" "));
+        println!("{}", s.join(" "));
         return Value::Undefined;
     }
 

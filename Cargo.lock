@@ -1,5 +1,5 @@
 [root]
-name = "Harvey"
+name = "harvey"
 version = "0.0.0"
 dependencies = [
  "readline 0.2.0 (git+https://github.com/shaleh/rust-readline)",
