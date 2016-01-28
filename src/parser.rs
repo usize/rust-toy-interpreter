@@ -141,9 +141,11 @@ impl Parser {
     fn parse_binop(&mut self, e1: Expr) -> Result<Expr, String> {
         let mut expr_list = vec!(e1);
         let mut op_list : Vec<(BinOp, u8)> = Vec::new();
+
         op_list.push(Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap());
         self.lexer.next_token();
         expr_list.push(try!(self.parse_term()));
+
         let mut end = false;
         while expr_list.len() > 1 {
             if !end && self.lexer.next_token() {
@@ -152,8 +154,9 @@ impl Parser {
                     end = true;
                     continue;
                 }
+
                 let (op2, prec2) = Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap();
-                self.lexer.next_token();
+
                 if prec2 > op_list.last().unwrap().1 {
                     let e1 = expr_list.pop().unwrap();
                     let e2 = expr_list.pop().unwrap();
@@ -163,6 +166,8 @@ impl Parser {
                         r_expr: e2
                     })));
                 }
+
+                self.lexer.next_token();
                 expr_list.push(try!(self.parse_term()));
                 op_list.push((op2, prec2));
             }
