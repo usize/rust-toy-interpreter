@@ -124,15 +124,6 @@ impl Parser {
         }
     }
 
-    // TODO: precedences ~!!@
-    fn parse_binop(&mut self, e1: Expr) -> Result<Expr, String> {
-        let (op, _) = Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap();
-        self.lexer.next_token();
-        let r_expr = try!(self.parse_expression());
-        let bop = BinaryOp{l_expr: e1, op: op, r_expr: r_expr};
-        return Ok(Expr::BinaryOperation(Box::new(bop)));
-    }
-
     fn parse_call(&mut self, e1: Expr) -> Result<Expr, String> {
         let mut expr_stack = Vec::new();
         expr_stack.push(e1);
@@ -147,7 +138,44 @@ impl Parser {
         return Ok(Expr::Call(expr_stack));
     }
 
-    // Wrap in a while loop
+    fn parse_binop(&mut self, e1: Expr) -> Result<Expr, String> {
+        let mut expr_list = vec!(e1);
+        let mut op_list : Vec<(BinOp, u8)> = Vec::new();
+        op_list.push(Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap());
+        self.lexer.next_token();
+        expr_list.push(try!(self.parse_term()));
+        let mut end = false;
+        while expr_list.len() > 1 {
+            if !end && self.lexer.next_token() {
+                if !self.lexer.current_is_type(TokenType::BinOp) {
+                    self.lexer.prev_token();
+                    end = true;
+                    continue;
+                }
+                let (op2, prec2) = Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap();
+                self.lexer.next_token();
+                if prec2 > op_list.last().unwrap().1 {
+                    let e1 = expr_list.pop().unwrap();
+                    let e2 = expr_list.pop().unwrap();
+                    expr_list.push(Expr::BinaryOperation(Box::new(BinaryOp{
+                        l_expr: e1,
+                        op: op_list.pop().unwrap().0,
+                        r_expr: e2
+                    })));
+                }
+                expr_list.push(try!(self.parse_term()));
+                op_list.push((op2, prec2));
+            }
+            let bop = BinaryOp{
+                l_expr: expr_list.pop().unwrap(),
+                op: op_list.pop().unwrap().0,
+                r_expr: expr_list.pop().unwrap()
+            };
+            expr_list.push(Expr::BinaryOperation(Box::new(bop)));
+        }
+        return Ok(expr_list.pop().unwrap());
+    }
+
     fn parse_expression(&mut self) -> Result<Expr, String> {
         let e1 = try!(self.parse_term());
         self.lexer.next_token();
