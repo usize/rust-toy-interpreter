@@ -158,6 +158,7 @@ impl Parser {
                 let (op2, prec2) = Lexer::bin_op(&self.lexer.curr_value()[..]).unwrap();
 
                 if prec2 > op_list.last().unwrap().1 {
+
                     let e1 = expr_list.pop().unwrap();
                     let e2 = expr_list.pop().unwrap();
                     expr_list.push(Expr::BinaryOperation(Box::new(BinaryOp{
@@ -165,6 +166,12 @@ impl Parser {
                         op: op_list.pop().unwrap().0,
                         r_expr: e2
                     })));
+
+                    self.lexer.next_token();
+                    expr_list.push(try!(self.parse_term()));
+                    op_list.push((op2, prec2));
+
+                    continue;
                 }
 
                 self.lexer.next_token();
