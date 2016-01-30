@@ -101,13 +101,13 @@ impl Value {
         })
     }
 
-    pub fn as_bool(&self) -> Value {
+    pub fn to_boolean(&self) -> bool {
         match *self {
-            Value::Number(ref v)    => Value::Bool(*v != 0 as f64),
-            Value::Str(ref v)       => Value::Bool(v.len() > 0),
-            Value::Bool(ref v)      => Value::Bool(*v == true),
-            Value::Object(_)    => Value::Bool(true),
-            Value::Undefined    => Value::Bool(false)
+            Value::Number(v)    => v != 0.0,
+            Value::Str(ref v)   => v.len() > 0,
+            Value::Bool(v)      => v,
+            Value::Object(_)    => true,
+            Value::Undefined    => false
         }
     }
 }

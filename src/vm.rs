@@ -96,25 +96,15 @@ impl VM {
                     }
                 },
                 OpCode::JumpIfNot(ref n) => {
-                    match self.stack.pop().unwrap().as_bool() {
-                        Value::Bool(v) => {
-                            if !v {
-                                self.ip = (self.ip as i32 + *n) as usize;
-                                continue;
-                            }
-                        },
-                        _ => ()
+                    if !self.stack.pop().unwrap().to_boolean() {
+                        self.ip = (self.ip as i32 + *n) as usize;
+                        continue;
                     }
                 },
                 OpCode::JumpIf(ref n) => {
-                    match self.stack.pop().unwrap().as_bool() {
-                        Value::Bool(v) => {
-                            if v {
-                                self.ip = (self.ip as i32  + *n) as usize;
-                                continue;
-                            }
-                        },
-                        _ => ()
+                    if self.stack.pop().unwrap().to_boolean() {
+                        self.ip = (self.ip as i32 + *n) as usize;
+                        continue;
                     }
                 },
                 OpCode::Jump(ref n) => {
