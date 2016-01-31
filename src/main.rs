@@ -26,7 +26,6 @@ extern crate toy_gc;
 const VERSION: &'static str = "0.0.0";
 
 fn main() {
-    let mut vm = VM::new();
     let mut parser = Parser::new();
     let mut scopes = HashMap::new();
 
@@ -55,7 +54,7 @@ fn main() {
             Err(msg) => println!("{}", msg),
             Ok(statements) => {
                 let script = compile_script(statements);
-                vm.load(script);
+                let mut vm = VM::new(script);
                 let result = vm.run(&mut scopes);
                 match result {
                     Ok(_) => (),
@@ -75,7 +74,7 @@ fn main() {
             Err(msg) => println!("{}", msg),
             Ok(statements) => {
                 let script = compile_script(statements);
-                vm.load(script);
+                let mut vm = VM::new(script);
                 let result = vm.run(&mut scopes);
                 match result {
                     Ok(Some(value)) => println!("{}", value),
@@ -102,8 +101,7 @@ fn eval(code: &str) -> Value {
     let ast = assert_ok!(parser.parse_lines(code.to_string()));
     let script = compile_script(ast);
 
-    let mut vm = VM::new();
-    vm.load(script);
+    let mut vm = VM::new(script);
 
     let mut scopes = HashMap::new();
     assert_ok!(vm.run(&mut scopes)).expect("script did not produce a value")

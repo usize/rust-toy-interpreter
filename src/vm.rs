@@ -21,19 +21,13 @@ macro_rules! binary_op {
 }
 
 impl VM {
-    pub fn new() -> VM {
+    pub fn new(program: Vec<OpCode>) -> VM {
         return VM{
-            program: Vec::new(),
+            program: program,
             stack: Vec::new(),
             ip: 0,
             running: false,
         };
-    }
-
-    pub fn load(&mut self, program: Vec<OpCode>) {
-        self.program = program;
-        self.stack = Vec::new();
-        self.ip = 0;
     }
 
     pub fn run(&mut self, scopes: &mut HashMap<String, Value>) -> Result<Option<Value>, String> {
@@ -98,7 +92,7 @@ impl VM {
                         Value::Object(o) => {
                             match o {
                                 Object::Function{args, body} => {
-                                    let mut frame = VM::new();
+                                    let mut frame = VM::new(body);
                                     for arg in args {
                                         if args_len > 0 {
                                             scopes.insert(arg.clone(), arg_values.pop().unwrap());
@@ -107,7 +101,6 @@ impl VM {
                                             scopes.insert(arg.clone(), Value::Undefined);
                                         }
                                     }
-                                    frame.load(body);
                                     match try!(frame.run(scopes)) {
                                         Some(result) => self.stack.push(result),
                                         None => ()
