@@ -20,6 +20,7 @@ mod value;
 mod vm;
 
 extern crate readline;
+extern crate toy_gc;
 
 const VERSION: &'static str = "0.0.0";
 
@@ -109,12 +110,28 @@ fn eval(code: &str) -> Value {
 
 #[test]
 fn it_works() {
+    /* binops */
     assert_eq!(eval("2 + 2"), Value::Number(4.0));
     assert_eq!(eval("0 / 0"), Value::Number(std::f64::NAN));
+    assert_eq!(eval("\"hello\" == \"world\""), Value::Bool(false));
+    assert_eq!(eval("\"hello\" != \"world\""), Value::Bool(true));
+    assert_eq!(eval("\"a\" > \"b\""), Value::Bool(false));
+    assert_eq!(eval("\"a\" < \"b\""), Value::Bool(true));
+    assert_eq!(eval("\"a\" == 97"), Value::Bool(false));
+    assert_eq!(eval("4 * 4 - 2 * 2 > 5/10 + 3"), Value::Bool(true));
+    assert_eq!(eval("4 * 4 - 2 * 2 >= 5/10 + 3"), Value::Bool(true));
+    assert_eq!(eval("1 >= 1"), Value::Bool(true));
+    assert_eq!(eval("1 > 1"), Value::Bool(false));
+    assert_eq!(eval("1 < 1"), Value::Bool(false));
+    assert_eq!(eval("1 <= 1"), Value::Bool(true));
     assert_eq!(eval(r#""hello" + "world""#), Value::Str("helloworld".to_string()));
+    /* whitespace */
     assert_eq!(eval("  1  "), Value::Number(1.0));
+    /* assignment */
     assert_eq!(eval("let x = 101; x;"), Value::Number(101.0));
+    /* loops */
     assert_eq!(eval("let x = 0; while (100 - x) { x = x + 1; }; x;"),
                Value::Number(100.0));
+    /* functions */
     assert_eq!(eval("(function (x){return x*2;})(25)"), Value::Number(50.0));
 }
