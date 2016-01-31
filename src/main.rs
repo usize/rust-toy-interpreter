@@ -17,6 +17,7 @@ mod opcode;
 mod object;
 mod lexer;
 mod value;
+mod ast;
 mod vm;
 
 extern crate readline;

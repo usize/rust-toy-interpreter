@@ -1,5 +1,5 @@
 use lexer::BinOp;
-use parser::{Statement, DefLet, Expr};
+use ast::{Statement, Expr};
 use opcode::OpCode;
 use value::Value;
 use object::Object;
@@ -7,10 +7,10 @@ use object::Object;
 fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
     match *expr {
         Expr::Atom(ref v) => script.push(OpCode::Val(v.clone())),
-        Expr::BinaryOperation(ref bop) => {
-            compile_expression(script, &bop.r_expr);
-            compile_expression(script, &bop.l_expr);
-            match bop.op {
+        Expr::BinaryOperation{ref l_expr, ref op, ref r_expr} => {
+            compile_expression(script, r_expr);
+            compile_expression(script, l_expr);
+            match *op {
                 BinOp::Plus     => script.push(OpCode::Add),
                 BinOp::Min      => script.push(OpCode::Sub),
                 BinOp::Mul      => script.push(OpCode::Mul),
@@ -52,9 +52,9 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
     }
 }
 
-fn compile_assignment(script: &mut Vec<OpCode>, deflet: &DefLet) {
-    compile_expression(script, &deflet.expr);
-    script.push(OpCode::Val(Value::Str(deflet.name.clone())));
+fn compile_assignment(script: &mut Vec<OpCode>, name: &String, expr: &Expr) {
+    compile_expression(script, expr);
+    script.push(OpCode::Val(Value::Str(name.clone())));
     script.push(OpCode::Def);
 }
 
@@ -63,7 +63,9 @@ pub fn compile_script(statements: Vec<Statement>) -> Vec<OpCode> {
     for statement in statements {
         match statement {
             Statement::Expression(s) => compile_expression(&mut script, &s),
-            Statement::Assignment(a) => compile_assignment(&mut script, &a),
+            Statement::Assignment{ref name, ref expr} => {
+                compile_assignment(&mut script, name, expr);
+            },
             Statement::If{cond, body} => {
                 compile_expression(&mut script, &cond);
                 let body = compile_script(body);

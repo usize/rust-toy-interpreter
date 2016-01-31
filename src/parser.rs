@@ -1,37 +1,6 @@
 use lexer::*;
 use value::*;
-
-#[derive(Debug, Clone)]
-pub struct BinaryOp {
-    pub l_expr: Expr,
-    pub op: BinOp,
-    pub r_expr: Expr,
-}
-
-#[derive(Debug, Clone)]
-pub enum Expr {
-    Atom(Value),
-    BinaryOperation(Box<BinaryOp>),
-    GetName(String),
-    Function{name: Option<String>, args: Vec<String>, body: Vec<Statement>},
-    Call(Vec<Expr>),
-    Return(Box<Expr>),
-}
-
-#[derive(Debug, Clone)]
-pub struct DefLet {
-    pub name: String,
-    pub expr: Expr
-}
-
-#[derive(Debug, Clone)]
-pub enum Statement {
-    Expression(Expr),
-    Assignment(DefLet),
-    If{cond: Expr, body: Vec<Statement>},
-    IfElse{cond: Expr, body: Vec<Statement>, else_body: Vec<Statement>},
-    While{cond: Expr, body: Vec<Statement>}
-}
+use ast::*;
 
 pub struct Parser {
     lexer:  Lexer
@@ -161,11 +130,11 @@ impl Parser {
 
                     let e1 = expr_list.pop().unwrap();
                     let e2 = expr_list.pop().unwrap();
-                    expr_list.push(Expr::BinaryOperation(Box::new(BinaryOp{
-                        l_expr: e1,
+                    expr_list.push(Expr::BinaryOperation{
+                        l_expr: Box::new(e1),
                         op: op_list.pop().unwrap().0,
-                        r_expr: e2
-                    })));
+                        r_expr: Box::new(e2)
+                    });
 
                     self.lexer.next_token();
                     expr_list.push(try!(self.parse_term()));
@@ -178,12 +147,12 @@ impl Parser {
                 expr_list.push(try!(self.parse_term()));
                 op_list.push((op2, prec2));
             }
-            let bop = BinaryOp{
-                l_expr: expr_list.pop().unwrap(),
+            let bop = Expr::BinaryOperation{
+                l_expr: Box::new(expr_list.pop().unwrap()),
                 op: op_list.pop().unwrap().0,
-                r_expr: expr_list.pop().unwrap()
+                r_expr: Box::new(expr_list.pop().unwrap())
             };
-            expr_list.push(Expr::BinaryOperation(Box::new(bop)));
+            expr_list.push(bop);
         }
         return Ok(expr_list.pop().unwrap());
     }
@@ -211,7 +180,7 @@ impl Parser {
                 try!(self.lexer.match_token(TokenType::Equals));
                 self.lexer.next_token();
                 let e = try!(self.parse_expression());
-                return Ok(Statement::Assignment(DefLet{name: name, expr: e}));
+                return Ok(Statement::Assignment{name: name, expr: e});
             },
             TokenType::Identifier => {
                 let name = self.lexer.curr_value();
@@ -224,7 +193,7 @@ impl Parser {
                 }
                 self.lexer.next_token();
                 let e = try!(self.parse_expression());
-                return Ok(Statement::Assignment(DefLet{name: name, expr: e}));
+                return Ok(Statement::Assignment{name: name, expr: e});
             },
             TokenType::If => {
                 self.lexer.next_token();
