@@ -24,20 +24,12 @@ extern crate readline;
 
 const VERSION: &'static str = "0.0.0";
 
-macro_rules! add_native {
-    ($name: expr, $func: ident, $scope: ident) => {
-        $scope.insert($name.to_string(),
-                      Value::Object(Object::Native(Native::Function($func))));
-    };
-}
-
 // A handy print method
 fn pr_native(args: Vec<Value>) -> Value {
     let s : Vec<String> = args.iter().map(|ref v| format!("{}", v)).collect();
     println!("{}", s.join(" "));
     return Value::Undefined;
 }
-
 
 fn main() {
     let mut parser = Parser::new();
@@ -46,7 +38,8 @@ fn main() {
     add_native!("print", pr_native, scopes);
 
     let args: Vec<String> = env::args().collect();
-    // let's run a script !
+
+    // If there are args we're running a script.
     if args.len() > 1 {
         let filename = &args[1];
         let mut f =  match File::open(filename) {
