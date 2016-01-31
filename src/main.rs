@@ -13,6 +13,7 @@ use vm::*;
 mod compiler;
 mod parser;
 mod opcode;
+#[macro_use]
 mod object;
 mod lexer;
 mod value;
@@ -20,7 +21,7 @@ mod ast;
 mod vm;
 
 extern crate readline;
-#[macro_use] extern crate cell_gc;
+extern crate cell_gc;
 
 const VERSION: &'static str = "0.0.0";
 
