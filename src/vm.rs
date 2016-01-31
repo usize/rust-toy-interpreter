@@ -10,6 +10,16 @@ pub struct VM {
     running:    bool,
 }
 
+macro_rules! binary_op {
+    ($vm_ref:expr, $a:ident, $b:ident, $r:expr) => {
+        {
+            let $b = $vm_ref.stack.pop().unwrap();
+            let $a = $vm_ref.stack.pop().unwrap();
+            $vm_ref.stack.push($r);
+        }
+    }
+}
+
 impl VM {
     pub fn new() -> VM {
         return VM{
@@ -31,56 +41,16 @@ impl VM {
         while self.running && self.ip < self.program.len() {
             match self.program[self.ip] {
                 OpCode::Val(ref v)  => self.stack.push(v.clone()),
-                OpCode::Add         => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(try!(a.add(b)));
-                },
-                OpCode::Sub         => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(try!(a.sub(b)));
-                },
-                OpCode::Mul         => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(try!(a.mul(b)));
-                },
-                OpCode::Div         => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(try!(a.div(b)));
-                },
-                OpCode::EqEq       => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(Value::Bool(a == b));
-                },
-                OpCode::NotEq     => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(Value::Bool(a != b));
-                },
-                OpCode::Lt       => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(Value::Bool(a < b));
-                },
-                OpCode::LtEq    => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(Value::Bool(a <= b));
-                },
-                OpCode::Gt       => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(Value::Bool(a > b));
-                },
-                OpCode::GtEq    => {
-                    let a = self.stack.pop().unwrap();
-                    let b = self.stack.pop().unwrap();
-                    self.stack.push(Value::Bool(a >= b));
-                },
+                OpCode::Add         => binary_op!(self, a, b, try!(a.add(b))),
+                OpCode::Sub         => binary_op!(self, a, b, try!(a.sub(b))),
+                OpCode::Mul         => binary_op!(self, a, b, try!(a.mul(b))),
+                OpCode::Div         => binary_op!(self, a, b, try!(a.div(b))),
+                OpCode::EqEq        => binary_op!(self, a, b, Value::Bool(a == b)),
+                OpCode::NotEq       => binary_op!(self, a, b, Value::Bool(a != b)),
+                OpCode::Lt          => binary_op!(self, a, b, Value::Bool(a < b)),
+                OpCode::LtEq        => binary_op!(self, a, b, Value::Bool(a <= b)),
+                OpCode::Gt          => binary_op!(self, a, b, Value::Bool(a > b)),
+                OpCode::GtEq        => binary_op!(self, a, b, Value::Bool(a >= b)),
                 OpCode::Def         => {
                     match self.stack.pop().unwrap() {
                         Value::Str(s) => {
