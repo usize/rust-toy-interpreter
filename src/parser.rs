@@ -15,27 +15,27 @@ impl Parser {
         return Parser{lexer: Lexer::from(tokens)};
     }
 
-    fn parse_term(&mut self) -> Result<Expr, String> {
+    fn parse_term(&mut self) -> Result<Expression, String> {
         match *self.lexer.curr_type() {
             TokenType::Int => {
                 let int = self.lexer.curr_value().parse::<i32>().unwrap();
-                return Ok(Expr::Atom(Value::Number(int as f64)));
+                return Ok(Expression::Atom(Value::Number(int as f64)));
             },
             TokenType::Float => {
                 let float = self.lexer.curr_value().parse::<f64>().unwrap();
-                return Ok(Expr::Atom(Value::Number(float)));
+                return Ok(Expression::Atom(Value::Number(float)));
             },
             TokenType::Str => {
-                return Ok(Expr::Atom(Value::Str(self.lexer.curr_value())));
+                return Ok(Expression::Atom(Value::Str(self.lexer.curr_value())));
             },
             TokenType::True => {
-                return Ok(Expr::Atom(Value::Bool(true)));
+                return Ok(Expression::Atom(Value::Bool(true)));
             },
             TokenType::False => {
-                return Ok(Expr::Atom(Value::Bool(false)));
+                return Ok(Expression::Atom(Value::Bool(false)));
             },
             TokenType::Identifier => {
-                let e1 = Expr::GetName(self.lexer.curr_value());
+                let e1 = Expression::GetName(self.lexer.curr_value());
                 if self.lexer.next_token() {
                     match *self.lexer.curr_type() {
                         TokenType::BinOp => return self.parse_binop(e1),
@@ -82,18 +82,18 @@ impl Parser {
                 try!(self.lexer.match_token(TokenType::RPar));
                 self.lexer.next_token();
                 let body = try!(self.parse_block());
-                return Ok(Expr::Function{name: name, args: args, body: body});
+                return Ok(Expression::Function{name: name, args: args, body: body});
             },
             TokenType::Return => {
                 self.lexer.next_token();
                 let e = try!(self.parse_expression());
-                return Ok(Expr::Return(Box::new(e)));
+                return Ok(Expression::Return(Box::new(e)));
             },
             _ => Err(String::from("unrecognized expression"))
         }
     }
 
-    fn parse_call(&mut self, e1: Expr) -> Result<Expr, String> {
+    fn parse_call(&mut self, e1: Expression) -> Result<Expression, String> {
         let mut expr_stack = Vec::new();
         expr_stack.push(e1);
         self.lexer.next_token();
@@ -104,10 +104,10 @@ impl Parser {
                 self.lexer.next_token();
             }
         }
-        return Ok(Expr::Call(expr_stack));
+        return Ok(Expression::Call(expr_stack));
     }
 
-    fn parse_binop(&mut self, e1: Expr) -> Result<Expr, String> {
+    fn parse_binop(&mut self, e1: Expression) -> Result<Expression, String> {
         let mut expr_list = vec!(e1);
         let mut op_list : Vec<(BinOp, u8)> = Vec::new();
 
@@ -130,7 +130,7 @@ impl Parser {
 
                     let e1 = expr_list.pop().unwrap();
                     let e2 = expr_list.pop().unwrap();
-                    expr_list.push(Expr::BinaryOperation{
+                    expr_list.push(Expression::BinaryOperation{
                         l_expr: Box::new(e1),
                         op: op_list.pop().unwrap().0,
                         r_expr: Box::new(e2)
@@ -147,7 +147,7 @@ impl Parser {
                 expr_list.push(try!(self.parse_term()));
                 op_list.push((op2, prec2));
             }
-            let bop = Expr::BinaryOperation{
+            let bop = Expression::BinaryOperation{
                 l_expr: Box::new(expr_list.pop().unwrap()),
                 op: op_list.pop().unwrap().0,
                 r_expr: Box::new(expr_list.pop().unwrap())
@@ -157,7 +157,7 @@ impl Parser {
         return Ok(expr_list.pop().unwrap());
     }
 
-    fn parse_expression(&mut self) -> Result<Expr, String> {
+    fn parse_expression(&mut self) -> Result<Expression, String> {
         let e1 = try!(self.parse_term());
         self.lexer.next_token();
         if self.lexer.tokens_remaining() > 0 &&
@@ -189,7 +189,7 @@ impl Parser {
                     // Whoops, this isn't an assignment
                     self.lexer.prev_token();
                     let e = try!(self.parse_expression());
-                    return Ok(Statement::Expression(e));
+                    return Ok(Statement::Expr(e));
                 }
                 self.lexer.next_token();
                 let e = try!(self.parse_expression());
@@ -229,7 +229,7 @@ impl Parser {
             },
             _ => {
                 let e = try!(self.parse_expression());
-                return Ok(Statement::Expression(e));
+                return Ok(Statement::Expr(e));
             },
         }
     }

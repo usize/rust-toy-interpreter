@@ -1,13 +1,13 @@
 use lexer::BinOp;
-use ast::{Statement, Expr};
+use ast::{Statement, Expression};
 use opcode::OpCode;
 use value::Value;
 use object::Object;
 
-fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
+fn compile_expression(script: &mut Vec<OpCode>, expr: &Expression) {
     match *expr {
-        Expr::Atom(ref v) => script.push(OpCode::Val(v.clone())),
-        Expr::BinaryOperation{ref l_expr, ref op, ref r_expr} => {
+        Expression::Atom(ref v) => script.push(OpCode::Val(v.clone())),
+        Expression::BinaryOperation{ref l_expr, ref op, ref r_expr} => {
             compile_expression(script, r_expr);
             compile_expression(script, l_expr);
             match *op {
@@ -23,10 +23,10 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
                 BinOp::GtEq     => script.push(OpCode::GtEq),
             }
         },
-        Expr::GetName(ref n) => {
+        Expression::GetName(ref n) => {
             script.push(OpCode::GetName(n.clone()))
         },
-        Expr::Function{ref name, ref args, ref body} => {
+        Expression::Function{ref name, ref args, ref body} => {
             let s = compile_script(body.clone());
             let o = Object::Function{args: args.clone(), body: s};
             script.push(OpCode::Val(Value::Object(o)));
@@ -38,21 +38,21 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expr) {
                 None => ()
             }
         },
-        Expr::Call(ref args) => {
+        Expression::Call(ref args) => {
             for e in args {
                 compile_expression(script, e);
             }
             script.push(OpCode::Val(Value::Number((args.len() as f64) - 1.0)));
             script.push(OpCode::Call);
         },
-        Expr::Return(ref e) => {
+        Expression::Return(ref e) => {
            compile_expression(script, e);
            script.push(OpCode::Ret);
         },
     }
 }
 
-fn compile_assignment(script: &mut Vec<OpCode>, name: &String, expr: &Expr) {
+fn compile_assignment(script: &mut Vec<OpCode>, name: &String, expr: &Expression) {
     compile_expression(script, expr);
     script.push(OpCode::Val(Value::Str(name.clone())));
     script.push(OpCode::Def);
@@ -62,7 +62,7 @@ pub fn compile_script(statements: Vec<Statement>) -> Vec<OpCode> {
     let mut script = Vec::new();
     for statement in statements {
         match statement {
-            Statement::Expression(s) => compile_expression(&mut script, &s),
+            Statement::Expr(s) => compile_expression(&mut script, &s),
             Statement::Assignment{ref name, ref expr} => {
                 compile_assignment(&mut script, name, expr);
             },
