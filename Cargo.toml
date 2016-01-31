@@ -3,7 +3,7 @@ name = "harvey"
 version = "0.0.0"
 authors = ["Morgan Phillips <winter2718@gmail.com>"]
 
-[dependencies.toy-gc]
+[dependencies.cell-gc]
 
 git = "https://github.com/jorendorff/rust-toy-gc"
 
