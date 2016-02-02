@@ -24,7 +24,6 @@ const VERSION: &'static str = "0.0.0";
 
 fn main() {
     let mut parser = Parser::new();
-    let mut scopes = HashMap::new();
 
     let args: Vec<String> = env::args().collect();
 
@@ -41,8 +40,8 @@ fn main() {
             Err(msg) => println!("{}", msg),
             Ok(statements) => {
                 let script = compile_script(statements);
-                let mut vm = VM::new(script);
-                let result = vm.run(&mut scopes);
+                let mut vm = VM::new();
+                let result = vm.run(&script);
                 match result {
                     Ok(_) => (),
                     Err(msg) => panic!("Error: {}", msg)
@@ -61,8 +60,8 @@ fn main() {
             Err(msg) => println!("{}", msg),
             Ok(statements) => {
                 let script = compile_script(statements);
-                let mut vm = VM::new(script);
-                let result = vm.run(&mut scopes);
+                let mut vm = VM::new();
+                let result = vm.run(&script);
                 match result {
                     Ok(Some(value)) => println!("{}", value),
                     Ok(None) => (),
@@ -88,10 +87,9 @@ fn eval(code: &str) -> Value {
     let ast = assert_ok!(parser.parse_lines(code.to_string()));
     let script = compile_script(ast);
 
-    let mut vm = VM::new(script);
+    let mut vm = VM::new();
 
-    let mut scopes = HashMap::new();
-    assert_ok!(vm.run(&mut scopes)).expect("script did not produce a value")
+    assert_ok!(vm.run(&script)).expect("script did not produce a value")
 }
 
 #[test]
@@ -113,11 +111,4 @@ fn it_works() {
     assert_eq!(eval(r#""hello" + "world""#), Value::Str("helloworld".to_string()));
     /* whitespace */
     assert_eq!(eval("  1  "), Value::Number(1.0));
-    /* assignment */
-    assert_eq!(eval("let x = 101; x;"), Value::Number(101.0));
-    /* loops */
-    assert_eq!(eval("let x = 0; while (100 - x) { x = x + 1; }; x;"),
-               Value::Number(100.0));
-    /* functions */
-    assert_eq!(eval("(function (x){return x*2;})(25)"), Value::Number(50.0));
 }
