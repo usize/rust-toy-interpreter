@@ -1,12 +1,10 @@
 use std::fmt;
 use std::cmp::Ordering;
-use object::Object;
 
 #[derive(Debug, Clone)]
 pub enum Value {
     Number(f64),
     Str(String),
-    Object(Object),
     Bool(bool),
     Undefined
 }
@@ -65,7 +63,6 @@ impl fmt::Display for Value {
             Value::Number(ref v) => write!(f, "{}", v),
             Value::Bool(ref b) => write!(f, "{}", b),
             Value::Str(ref s) => write!(f, "{}", s),
-            Value::Object(_)   => write!(f, "[Object]"),
             Value::Undefined => write!(f, "undefined"),
         }
     }
@@ -106,7 +103,6 @@ impl Value {
             Value::Number(v)    => v != 0.0,
             Value::Str(ref v)   => v.len() > 0,
             Value::Bool(v)      => v,
-            Value::Object(_)    => true,
             Value::Undefined    => false
         }
     }
