@@ -2,6 +2,7 @@ use lexer::BinOp;
 use ast::{Statement, Expression};
 use opcode::OpCode;
 use value::Value;
+use object::Object;
 
 fn compile_expression(script: &mut Vec<OpCode>, expr: &Expression) {
     match *expr {
@@ -26,15 +27,35 @@ fn compile_expression(script: &mut Vec<OpCode>, expr: &Expression) {
             script.push(OpCode::GetName(n.clone()))
         },
         Expression::Function{ref name, ref args, ref body} => {
+            let s = compile_script(body.clone());
+            let o = Object::Function{args: args.clone(), body: s};
+            script.push(OpCode::Val(Value::Object(o)));
+            match *name {
+                Some(ref v) => {
+                    script.push(OpCode::Val(Value::Str(v.clone())));
+                    script.push(OpCode::Def);
+                },
+                None => ()
+            }
         },
         Expression::Call(ref args) => {
+            for e in args {
+                compile_expression(script, e);
+            }
+            script.push(OpCode::Val(Value::Number((args.len() as f64) - 1.0)));
+            script.push(OpCode::Call);
         },
         Expression::Return(ref e) => {
+           compile_expression(script, e);
+           script.push(OpCode::Ret);
         },
     }
 }
 
 fn compile_assignment(script: &mut Vec<OpCode>, name: &String, expr: &Expression) {
+    compile_expression(script, expr);
+    script.push(OpCode::Val(Value::Str(name.clone())));
+    script.push(OpCode::Def);
 }
 
 pub fn compile_script(statements: Vec<Statement>) -> Vec<OpCode> {

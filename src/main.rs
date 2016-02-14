@@ -5,6 +5,7 @@ use std::io::prelude::*;
 use std::collections::HashMap;
 
 use value::Value;
+use object::{Object, Native};
 use compiler::*;
 use parser::*;
 use vm::*;
@@ -12,6 +13,8 @@ use vm::*;
 mod compiler;
 mod parser;
 mod opcode;
+#[macro_use]
+mod object;
 mod lexer;
 mod value;
 mod ast;
@@ -22,9 +25,18 @@ extern crate cell_gc;
 
 const VERSION: &'static str = "0.0.0";
 
+// A handy print method
+fn pr_native(args: Vec<Value>) -> Value {
+    let s : Vec<String> = args.iter().map(|ref v| format!("{}", v)).collect();
+    println!("{}", s.join(" "));
+    return Value::Undefined;
+}
+
 fn main() {
     let mut parser = Parser::new();
     let mut scopes = HashMap::new();
+
+    add_native!("print", pr_native, scopes);
 
     let args: Vec<String> = env::args().collect();
 
