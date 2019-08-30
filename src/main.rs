@@ -1,6 +1,7 @@
 use std::env;
 use std::process;
 use std::fs::File;
+use std::io;
 use std::io::prelude::*;
 use std::collections::HashMap;
 
@@ -19,9 +20,6 @@ mod lexer;
 mod value;
 mod ast;
 mod vm;
-
-extern crate readline;
-extern crate cell_gc;
 
 const VERSION: &'static str = "0.0.0";
 
@@ -67,8 +65,8 @@ fn main() {
     println!("Harvey {} (github.com/mrrrgn/harvey)", VERSION);
 
     loop {
-        let input = readline::readline("Harvey> ").unwrap();
-        readline::add_history(&input);
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
         match parser.parse_lines(input.clone()) {
             Err(msg) => println!("{}", msg),
             Ok(statements) => {
