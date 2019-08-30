@@ -62,7 +62,7 @@ fn main() {
         process::exit(0);
     }
 
-    println!("Harvey {} (github.com/mrrrgn/harvey)", VERSION);
+    println!("v{} (github.com/mrrrgn/rust-js)", VERSION);
 
     loop {
         let mut input = String::new();
